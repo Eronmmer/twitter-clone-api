@@ -1,0 +1,26 @@
+{
+  "name": "simple-api-with-express",
+  "version": "1.0.0",
+  "description": "A simple Express API code for one of my articles",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon index.js",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Eronmmer/simple-api-with-express.git"
+  },
+  "keywords": [
+    "api",
+    "express",
+    "node.js"
+  ],
+  "author": "Erons",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Eronmmer/simple-api-with-express/issues"
+  },
+  "homepage": "https://github.com/Eronmmer/simple-api-with-express#readme"
+}
