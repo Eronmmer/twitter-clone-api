@@ -2,7 +2,7 @@
 
 In an attempt to mimic the backend architecture of Twitter while practicing Express and Node.js. 
 
-Chill, it's just a REST API 😂 
+Chill, it's just a REST API with only few of Twitter's features 😂 
 
 ## Features
 

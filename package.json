@@ -1,7 +1,7 @@
 {
-  "name": "simple-api-with-express",
+  "name": "twitter-clone-api",
   "version": "1.0.0",
-  "description": "A simple Express API code for one of my articles",
+  "description": "It is what it is.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Eronmmer/simple-api-with-express.git"
+    "url": "git+https://github.com/Eronmmer/twitter-clone-api.git"
   },
   "keywords": [
     "api",
@@ -20,9 +20,9 @@
   "author": "Erons",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Eronmmer/simple-api-with-express/issues"
+    "url": "https://github.com/Eronmmer/twitter-clone-api/issues"
   },
-  "homepage": "https://github.com/Eronmmer/simple-api-with-express#readme",
+  "homepage": "https://github.com/Eronmmer/twitter-clone-api#readme",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "compression": "^1.7.4",
