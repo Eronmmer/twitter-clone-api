@@ -324,6 +324,8 @@ router.delete("/delete/:tweetId", authenticator, async (req, res, next) => {
       return res.status(401).send("Not authorized!");
     }
     await tweet.remove();
+
+    // remove this tweet from everywhere else(tweeter's tweets, likes, retweets, etc)
     res.status(200).send("Post successfully deleted");
   } catch (err) {
     if (err.kind === "ObjectId") {

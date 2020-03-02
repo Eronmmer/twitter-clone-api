@@ -10,7 +10,7 @@ const User = require("../models/User");
 // get verified while logged in
 router.get("/", authenticator, async (req, res, next) => {
   try {
-    const user = await User.findById(req.user.id).select(["-_id", "-password"]);
+    const user = await User.findById(req.user.id).select(["-password"]);
     res.json({ user });
   } catch (err) {
     next(err);
