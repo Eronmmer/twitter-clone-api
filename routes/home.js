@@ -10,12 +10,12 @@ while showing this timeline to users, make sure to exclude those of blocked and 
  */
 
 // top tweets
-router.get("/:topTweets", (req, res) => {
+router.get("/:topTweets", (req, res, next) => {
   res.send("home bitch");
 });
 
 // latest tweets
-router.get("/:latestTweets", (req, res) => {
+router.get("/:latestTweets", (req, res, next) => {
   res.send("home bitch");
 });
 

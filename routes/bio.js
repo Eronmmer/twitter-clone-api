@@ -75,7 +75,10 @@ router.delete("/:resource", authenticator, async (req, res, next) => {
       default:
         next();
     }
-  } catch (err) {
+  } catch ( err ) {
+    if ( err.kind = "ObjectId" ) {
+      return res.status(400).send("Not allowed!")
+    }
     next(err);
   }
 });

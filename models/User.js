@@ -66,7 +66,14 @@ const UserSchema = new mongoose.Schema({
       ref: "users"
     }
   ],
+  // with retweets
   tweets: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "posts"
+    }
+  ],
+  likes: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "posts"

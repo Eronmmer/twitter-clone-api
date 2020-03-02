@@ -1,9 +1,19 @@
 const mongoose = require("mongoose");
 
-const PostSchema = new mongoose.Schema({
+const CommentSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "users"
+  },
+  commentedOn: {
+    type: mongoose.Schema.Types.ObjectId,
+    refPath: "onModel",
+    required: true
+  },
+  onModel: {
+    type: String,
+    required: true,
+    enum: ["posts", "comments"]
   },
   edited: {
     type: Boolean,
@@ -36,18 +46,6 @@ const PostSchema = new mongoose.Schema({
       ref: "users"
     }
   ],
-  quotedReply: {
-    type: Boolean,
-    default: false
-  },
-  replyQuoted: {
-    type: mongoose.Schema.Types.ObjectId,
-    refPath: "onModelQuoted"
-  },
-  onModelQuoted: {
-    type: String,
-    enum: ["posts", "comments"]
-  },
   quotedReplies: [
     {
       type: mongoose.Schema.Types.ObjectId,
@@ -66,9 +64,8 @@ const PostSchema = new mongoose.Schema({
   },
   tweetType: {
     type: String,
-    default: "posts"
+    default: "comments"
   }
 });
 
-const PostModel = mongoose.model("posts", PostSchema);
-module.exports = PostModel;
+module.exports = mongoose.model("comments", CommentSchema);

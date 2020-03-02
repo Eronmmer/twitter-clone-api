@@ -11,7 +11,7 @@ const authenticator = (req, res, next) => {
     const decoded = jwt.verify(token, secret);
     req.user = decoded.user;
   } catch (err) {
-    console.error(err);
+    console.error(`${err}`.red.bold.underline);
     res.status(401).send("Not authorized");
   } finally {
     next();
