@@ -1,32 +1,27 @@
 require("dotenv").config();
 const express = require("express");
+const chalk = require("chalk");
 const app = express();
-const colors = require("colors");
 const PORT = process.env.PORT || 5000;
 const HOST = process.env.HOST || "127.0.0.1";
 const routes = require("./routes");
 const middleware = require("./middleware");
 const errorHandlers = require("./middleware/errorHandlers");
 const { applyRoutes, applyMiddleware, connectDB } = require("./utils");
+const magentaUnderline = chalk.magenta.underline;
 
-// connect database
 connectDB();
 
-// load common, basic middleware
 applyMiddleware(middleware, app);
 
 app.get("/", (req, res) => {
-	res.send("Welcome to Fotia API!");
+	res.send("API up and running");
 });
 
-// load routes
 applyRoutes(routes, app);
 
-// error handler middleware
 applyMiddleware(errorHandlers, app);
 
 app.listen(PORT, HOST, () => {
-	console.log(
-		`Server started on http://${HOST}:${PORT}/`.rainbow.bold.underline
-	);
+	console.log(magentaUnderline(`Server started on http://${HOST}:${PORT}/`));
 });
