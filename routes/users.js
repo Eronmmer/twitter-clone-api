@@ -52,7 +52,6 @@ router.post(
 
       await user.save();
       res.status(200).send("Account successfully created");
-      user.save();
     } catch (err) {
       next(err);
     }
