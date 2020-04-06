@@ -6,7 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon index.js",
-    "start": "node index.js"
+    "start": "node index.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix --ext .js,.ts, ."
   },
   "repository": {
     "type": "git",
@@ -38,6 +40,9 @@
     "morgan": "^1.9.1"
   },
   "devDependencies": {
-    "nodemon": "^2.0.2"
+    "eslint": "^6.8.0",
+    "eslint-plugin-import": "^2.20.2",
+    "nodemon": "^2.0.2",
+    "prettier": "^2.0.4"
   }
 }

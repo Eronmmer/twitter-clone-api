@@ -1,7 +1,7 @@
 require("dotenv").config();
-const express = require( "express" );
+const express = require("express");
 const app = express();
-const colors = require("colors")
+const colors = require("colors");
 const PORT = process.env.PORT || 5000;
 const HOST = process.env.HOST || "127.0.0.1";
 const routes = require("./routes");
@@ -16,7 +16,7 @@ connectDB();
 applyMiddleware(middleware, app);
 
 app.get("/", (req, res) => {
-  res.send("Welcome to Fotia API!");
+	res.send("Welcome to Fotia API!");
 });
 
 // load routes
@@ -26,5 +26,7 @@ applyRoutes(routes, app);
 applyMiddleware(errorHandlers, app);
 
 app.listen(PORT, HOST, () => {
-  console.log(`Server started on http://${HOST}:${PORT}/`.rainbow.bold.underline);
+	console.log(
+		`Server started on http://${HOST}:${PORT}/`.rainbow.bold.underline
+	);
 });

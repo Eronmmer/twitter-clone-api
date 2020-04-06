@@ -5,30 +5,30 @@ const helmet = require("helmet");
 const compression = require("compression");
 
 const handleLogger = router => {
-  router.use(morgan("combined"));
+	router.use(morgan("combined"));
 };
 
 const handleBodyRequestParsing = router => {
-  router.use(express.json());
-  router.use(express.urlencoded({ extended: false }));
+	router.use(express.json());
+	router.use(express.urlencoded({ extended: false }));
 };
 
 const handleCors = router => {
-  router.use(cors({ credentials: true, origin: true }));
+	router.use(cors({ credentials: true, origin: true }));
 };
 
 const handleCompression = router => {
-  router.use(compression());
+	router.use(compression());
 };
 
 const handleHelmet = router => {
-  router.use(helmet());
+	router.use(helmet());
 };
 
 module.exports = {
-  handleLogger,
-  handleBodyRequestParsing,
-  handleCompression,
-  handleCors,
-  handleHelmet
+	handleLogger,
+	handleBodyRequestParsing,
+	handleCompression,
+	handleCors,
+	handleHelmet
 };

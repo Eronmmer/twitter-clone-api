@@ -6,10 +6,10 @@ const bio = require("./bio");
 const engage = require("./engage");
 
 module.exports = [
-  { endpoint: "/api/posts", route: posts },
-  { endpoint: "/api/users", route: users },
-  { endpoint: "/api/auth", route: auth },
-  { endpoint: "/api/home", route: home },
-  { endpoint: "/api/bio", route: bio },
-  { endpoint: "/api/engage", route: engage },
+	{ endpoint: "/api/posts", route: posts },
+	{ endpoint: "/api/users", route: users },
+	{ endpoint: "/api/auth", route: auth },
+	{ endpoint: "/api/home", route: home },
+	{ endpoint: "/api/bio", route: bio },
+	{ endpoint: "/api/engage", route: engage },
 ];
