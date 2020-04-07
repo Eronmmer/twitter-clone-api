@@ -540,8 +540,6 @@ router.delete("/delete/:tweetId", authenticator, async (req, res, next) => {
 			});
 		}
 		await tweet.remove();
-
-		// remove this tweet from everywhere else(tweeter's tweets, likes, retweets, etc)
 		res.json({
 			data: {
 				msg: "Tweet deleted"
