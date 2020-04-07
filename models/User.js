@@ -73,18 +73,18 @@ const UserSchema = new mongoose.Schema({
 		},
 	],
 	// with retweets
-	tweets: [
-		{
-			type: mongoose.Schema.Types.ObjectId,
-			ref: "posts",
-		},
-	],
-	likes: [
-		{
-			type: mongoose.Schema.Types.ObjectId,
-			ref: "posts",
-		},
-	],
+	// tweets: [
+	// 	{
+	// 		type: mongoose.Schema.Types.ObjectId,
+	// 		ref: "posts",
+	// 	},
+	// ],
+	// likes: [
+	// 	{
+	// 		type: mongoose.Schema.Types.ObjectId,
+	// 		ref: "posts",
+	// 	},
+	// ],
 	date: {
 		type: Date,
 		default: Date.now,

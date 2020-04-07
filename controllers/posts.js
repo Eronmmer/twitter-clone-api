@@ -52,7 +52,7 @@ exports.getTweet = async (req, res, next) => {
 				},
 			});
 		} else {
-			const { commentedOn, monModel } = tweet;
+			const { commentedOn, onModel } = tweet;
 			return res.status(200).json({
 				data: {
 					tweet: {
@@ -66,7 +66,7 @@ exports.getTweet = async (req, res, next) => {
 						tweetType,
 						date,
 						commentedOn,
-						monModel,
+						onModel,
 					},
 				},
 			});
@@ -97,7 +97,7 @@ exports.createTweet = async (req, res, next) => {
 		const { postContent } = req.body;
 		const newPost = new Post({
 			postContent,
-			user,
+			user: user.id,
 		});
 
 		const tweet = await newPost.save();
@@ -183,11 +183,11 @@ exports.editTweet = async (req, res, next) => {
 			});
 		}
 		if (tweet.user.toString() !== req.user.id) {
-			return res.status(401).json({
+			return res.status(403).json({
 				errors: [
 					{
-						msg: "Not authorized",
-						status: "401",
+						msg: "You're not allowed to do this",
+						status: "403",
 					},
 				],
 			});
@@ -237,10 +237,6 @@ exports.likeTweet = async (req, res, next) => {
 		}
 		tweet.likes.unshift(user);
 		await tweet.save();
-
-		// add to user's likes
-		findUser.likes.unshift(req.params.tweetId);
-		await findUser.save();
 		res.json({ data: { likes: tweet.likes } });
 	} catch (err) {
 		if (err.kind === "ObjectId") {
@@ -290,13 +286,6 @@ exports.unlikeTweet = async (req, res, next) => {
 		const index = tweet.likes.findIndex((e) => e.toString() === user);
 		tweet.likes.splice(index, 1);
 		tweet.save();
-
-		// remove from user's likes
-		const userIndex = findUser.likes.findIndex(
-			(e) => e.toString() === req.params.tweetId
-		);
-		findUser.likes.splice(userIndex, 1);
-		await findUser.save();
 		res.json({ data: { likes: tweet.likes } });
 	} catch (err) {
 		if (err.kind === "ObjectId") {
@@ -399,10 +388,6 @@ exports.retweet = async (req, res, next) => {
 		}
 		tweet.retweets.unshift(user);
 		await tweet.save();
-
-		// add retweet to user's tweets
-		findUser.tweets.unshift(req.params.tweetId);
-		await findUser.save();
 		res.json({ data: { retweets: tweet.retweets } });
 	} catch (err) {
 		if (err.kind === "ObjectId") {
@@ -450,13 +435,6 @@ exports.undoRetweet = async (req, res, next) => {
 		const index = tweet.retweets.findIndex((e) => e.toString() === user);
 		tweet.retweets.splice(index, 1);
 		tweet.save();
-
-		// remove from user's tweets
-		const userIndex = findUser.tweets.findIndex(
-			(e) => e.toString() === req.params.tweetId
-		);
-		findUser.tweets.splice(userIndex, 1);
-		await findUser.save();
 		res.json({ data: { retweets: tweet.retweets } });
 	} catch (err) {
 		if (err.kind === "ObjectId") {
@@ -492,11 +470,11 @@ exports.deleteTweet = async (req, res, next) => {
 			});
 		}
 		if (tweet.user.toString() !== req.user.id) {
-			return res.status(401).json({
+			return res.status(403).json({
 				errors: [
 					{
-						msg: "Not authorized",
-						status: "401",
+						msg: "You're not allowed to do this",
+						status: "403",
 					},
 				],
 			});
