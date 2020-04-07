@@ -15,32 +15,73 @@ there will be
 router.put("/follow/:userId", authenticator, async (req, res, next) => {
 	try {
 		const userToFollow = await User.findById(req.params.userId);
-		const follower = await User.findById(req.user.id);
+		const user = await User.findById(req.user.id);
+		if (!user) {
+			return res.status(401).json({
+				errors: [
+					{
+						msg: "Not authorized",
+						status: "401",
+					},
+				],
+			});
+		}
 		if (!userToFollow) {
-			return res.status(404).send("This user does not exist");
+			return res.status(404).json({
+				errors: [
+					{
+						msg: "User not found",
+						status: "404",
+					},
+				],
+			});
 		}
 
 		// make sure user doesn't follow himself
 		if (req.params.userId === req.user.id) {
-			return res.status(400).send("Sorry fella, you can't follow thyself...");
+			return res.status(400).json({
+				errors: [
+					{
+						msg: "Not allowed",
+						status: "400",
+					},
+				],
+			});
 		}
 
 		// check if user is already following
 		if (
-			userToFollow.followers.filter(user => user.toString() === req.user.id)
+			userToFollow.followers.filter((user) => user.toString() === req.user.id)
 				.length === 1
 		) {
-			return res.status(400).send("You're already following this user!");
+			return res.status(400).json({
+				errors: [
+					{
+						msg: "Not allowed",
+						status: "400",
+					},
+				],
+			});
 		}
 
 		userToFollow.followers.unshift(req.user.id);
-		follower.following.unshift({ user: req.params.userId });
+		user.following.unshift({ user: req.params.userId });
 		await userToFollow.save();
-		await follower.save();
-		res.json({ msg: "Successfully followed", follower, userToFollow });
+		await user.save();
+		res.json({
+			data: {
+				following: user.following,
+			},
+		});
 	} catch (err) {
 		if (err.kind === "ObjectId") {
-			return res.status(404).send("This user does not exist");
+			return res.status(404).json({
+				errors: [
+					{
+						msg: "User not found",
+					},
+				],
+			});
 		}
 		next(err);
 	}
@@ -50,39 +91,81 @@ router.put("/follow/:userId", authenticator, async (req, res, next) => {
 router.put("/unfollow/:userId", authenticator, async (req, res, next) => {
 	try {
 		const userToUnfollow = await User.findById(req.params.userId);
-		const follower = await User.findById(req.user.id);
+		const user = await User.findById(req.user.id);
+		if (!user) {
+			return res.status(401).json({
+				errors: [
+					{
+						msg: "Not authorized",
+						status: "401",
+					},
+				],
+			});
+		}
 		if (!userToUnfollow) {
-			return res.status(404).send("This user does not exist");
+			return res.status(404).json({
+				errors: [
+					{
+						msg: "User not found",
+						status: "404",
+					},
+				],
+			});
 		}
 
-		// make sure user doesn't unfollow theirself
+		// make sure user doesn't unfollow themselves
 		if (req.params.userId === req.user.id) {
-			return res.status(400).send("Sorry fella, you can't unfollow thyself...");
+			return res.status(400).json({
+				errors: [
+					{
+						msg: "Not allowed",
+						status: "400",
+					},
+				],
+			});
 		}
 
 		// check if user is not following
 		if (
-			userToUnfollow.followers.filter(user => user.toString() === req.user.id)
+			userToUnfollow.followers.filter((user) => user.toString() === req.user.id)
 				.length === 0
 		) {
-			return res.status(400).send("You're not following this user fella...");
+			return res.status(400).json({
+				errors: [
+					{
+						msg: "Not allowed",
+						status: "400",
+					},
+				],
+			});
 		}
 
-		userToUnfollowIndex = userToUnfollow.followers.findIndex(
-			e => e.toString() === req.user.id
+		const userToUnfollowIndex = userToUnfollow.followers.findIndex(
+			(e) => e.toString() === req.user.id
 		);
 		userToUnfollow.followers.splice(userToUnfollowIndex, 1);
 
-		followerIndex = follower.following.findIndex(
-			e => e.user.toString() === req.params.userId
+		const userIndex = user.following.findIndex(
+			(e) => e.user.toString() === req.params.userId
 		);
-		follower.following.splice(followerIndex, 1);
+		user.following.splice(userIndex, 1);
 		await userToUnfollow.save();
-		await follower.save();
-		res.json({ msg: "Successfully unfollowed", follower, userToUnfollow });
+		await user.save();
+		res.json({
+			data: {
+				following: user.following,
+			},
+		});
 	} catch (err) {
 		if (err.kind === "ObjectId") {
-			return res.status(404).send("This user does not exist");
+			return res.status(404).json({
+				errors: [
+					{
+						msg: "User not found",
+						status: "404",
+					},
+				],
+			});
 		}
 		next(err);
 	}
@@ -93,28 +176,73 @@ router.put("/block/:userId", authenticator, async (req, res, next) => {
 	try {
 		const userToBlock = await User.findById(req.params.userId);
 		const user = await User.findById(req.user.id);
+		if (!user) {
+			return res.status(401).json({
+				errors: [
+					{
+						msg: "Not authorized",
+						status: "401",
+					},
+				],
+			});
+		}
 		if (!userToBlock) {
-			return res.status(404).send("This user does not exist");
+			return res.status(404).json({
+				errors: [
+					{
+						msg: "User not found",
+						status: "404",
+					},
+				],
+			});
 		}
 
 		// make sure they can't block themselves
 		if (req.user.id === req.params.userId) {
-			return res.status(400).send("Sorry fella, you can't block thyself...");
+			return res.status(400).json({
+				errors: [
+					{
+						msg: "Not alowed",
+						status: "400",
+					},
+				],
+			});
 		}
 
-		// check if they've already been blocked
+		// check if the user has already been blocked
 		if (
-			user.blocked.filter(e => e.toString() === req.params.userId).length === 1
+			user.blocked.filter((e) => e.toString() === req.params.userId).length ===
+			1
 		) {
-			return res.status(400).send("You've already blocked this guy fella...");
+			return res.status(400).json({
+				errors: [
+					{
+						msg: "Not allowed",
+						status: "401",
+					},
+				],
+			});
 		}
 
 		user.blocked.unshift(req.params.userId);
+		userToBlock.blockedMe.unshift(req.user.id);
 		user.save();
-		res.json({ msg: "successfully blocked", blocked: user.blocked });
+		userToBlock.save();
+		res.json({
+			data: {
+				blocked: user.blocked,
+			},
+		});
 	} catch (err) {
 		if (err.kind === "ObjectId") {
-			return res.status(404).send("This user does not exist");
+			return res.status(404).json({
+				errors: [
+					{
+						msg: "User not found",
+						status: "404",
+					},
+				],
+			});
 		}
 		next(err);
 	}
@@ -126,32 +254,68 @@ router.put("/unblock/:userId", authenticator, async (req, res, next) => {
 		const userToUnblock = await User.findById(req.params.userId);
 		const user = await User.findById(req.user.id);
 		if (!userToUnblock) {
-			return res.status(404).send("This user does not exist");
+			return res.status(404).json({
+				errors: [
+					{
+						msg: "User not found",
+						status: "404",
+					},
+				],
+			});
 		}
 
 		// make sure they can't unblock themselves
 		if (req.user.id === req.params.userId) {
-			return res.status(400).send("Sorry fella, you can't unblock thyself...");
+			return res.status(400).json({
+				errors: [
+					{
+						msg: "Not allowed",
+						status: "400",
+					},
+				],
+			});
 		}
 
 		// check if they're trying to unblock who they haven't blocked
 		if (
-			user.blocked.filter(e => e.toString() === req.params.userId).length === 0
+			user.blocked.filter((e) => e.toString() === req.params.userId).length ===
+			0
 		) {
-			return res
-				.status(400)
-				.send("You can't unblock who you haven't blocked...");
+			return res.status(400).json({
+				errors: [
+					{
+						msg: "Not allowed",
+						status: "40",
+					},
+				],
+			});
 		}
 
 		const blockedIndex = user.blocked.findIndex(
-			e => e.toString() === req.params.userId
+			(e) => e.toString() === req.params.userId
+		);
+		const blockedMeIndex = userToUnblock.blockedMe.findIndex(
+			(e) => e.toString() === req.user.id
 		);
 		user.blocked.splice(blockedIndex, 1);
+		userToUnblock.blockedMe.splice(blockedMeIndex, 1);
 		user.save();
-		res.json({ msg: "successfully unblocked", blocked: user.blocked });
+		userToUnblock.save();
+		res.json({
+			data: {
+				blocked: user.blocked,
+			},
+		});
 	} catch (err) {
 		if (err.kind === "ObjectId") {
-			return res.status(404).send("This user does not exist");
+			return res.status(404).json({
+				errors: [
+					{
+						msg: "User not found",
+						status: "404",
+					},
+				],
+			});
 		}
 		next(err);
 	}
@@ -162,28 +326,61 @@ router.put("/mute/:userId", authenticator, async (req, res, next) => {
 	try {
 		const userToMute = await User.findById(req.params.userId);
 		const user = await User.findById(req.user.id);
+		if (!user) {
+			return res.status(401).json({
+				errors: [
+					{
+						msg: "Not authorized",
+						status: "401",
+					},
+				],
+			});
+		}
 		if (!userToMute) {
-			return res.status(404).send("This user does not exist");
+			return res.status(404).json({
+				errors: [
+					{
+						msg: "User not found",
+						status: "404",
+					},
+				],
+			});
 		}
 
 		// make sure they can't mute themselves
 		if (req.user.id === req.params.userId) {
-			return res.status(400).send("Sorry fella, you can't mute thyself...");
+			return res.status(400).json({
+				errors: [
+					{
+						msg: "Not allowed",
+						status: "400",
+					},
+				],
+			});
 		}
 
 		// check if they've already been muted
 		if (
-			user.muted.filter(e => e.toString() === req.params.userId).length === 1
+			user.muted.filter((e) => e.toString() === req.params.userId).length === 1
 		) {
-			return res.status(400).send("You've already muted this guy fella...");
+			return res.status(400).json({
+				errors: [
+					{
+						msg: "Not allowed",
+						status: "400",
+					},
+				],
+			});
 		}
 
 		user.muted.unshift(req.params.userId);
 		user.save();
-		res.json({ msg: "successfully muted", muted: user.muted });
+		res.json({ data: { muted: user.muted } });
 	} catch (err) {
 		if (err.kind === "ObjectId") {
-			return res.status(404).send("This user does not exist");
+			return res.status(404).json({
+				errors: [{ msg: "User not found", status: "404" }],
+			});
 		}
 		next(err);
 	}
@@ -194,31 +391,49 @@ router.put("/unmute/:userId", authenticator, async (req, res, next) => {
 	try {
 		const userToUnmute = await User.findById(req.params.userId);
 		const user = await User.findById(req.user.id);
+		if (!user) {
+			return res.status(401).json({
+				errors: [{ msg: "Not authorized", status: "401" }],
+			});
+		}
 		if (!userToUnmute) {
-			return res.status(404).send("This user does not exist");
+			return res.status(404).json({
+				errors: [{ msg: "User not found", status: "404" }],
+			});
 		}
 
 		// make sure they can't unmute themselves
 		if (req.user.id === req.params.userId) {
-			return res.status(400).send("Sorry fella, you can't unmute thyself...");
+			return res.status(400).json({
+				errors: [
+					{
+						msg: "Not allowed",
+						status: "400",
+					},
+				],
+			});
 		}
 
 		// check if they're trying to unmute who they haven't muted
 		if (
-			user.muted.filter(e => e.toString() === req.params.userId).length === 0
+			user.muted.filter((e) => e.toString() === req.params.userId).length === 0
 		) {
-			return res.status(400).send("You can't unmute who you haven't muted...");
+			return res.status(400).json({
+				errors: [{ msg: "Not allowed" }],
+			});
 		}
 
 		const mutedIndex = user.muted.findIndex(
-			e => e.toString() === req.params.userId
+			(e) => e.toString() === req.params.userId
 		);
 		user.muted.splice(mutedIndex, 1);
 		user.save();
-		res.json({ msg: "successfully unmuted", muted: user.muted });
+		res.json({ data: { muted: user.muted } });
 	} catch (err) {
 		if (err.kind === "ObjectId") {
-			return res.status(404).send("This user does not exist");
+			return res
+				.status(404)
+				.json({ errors: [{ msg: "User not found", status: "404" }] });
 		}
 		next(err);
 	}
@@ -233,31 +448,49 @@ router.put(
 			const following = await User.findById(req.params.userId);
 			const user = await User.findById(req.user.id);
 
+			if (!user) {
+				return res.status(401).json({
+					errors: [
+						{
+							msg: "Not authorized",
+							status: "401",
+						},
+					],
+				});
+			}
 			if (!following) {
-				return res.status(404).send("This user does not exist!");
+				return res.status(404).json({
+					errors: [
+						{
+							msg: "User not found",
+							status: "404",
+						},
+					],
+				});
 			}
 
 			// verify that user isn't turning on notifications for themselves.
 			if (req.user.id === req.params.userId) {
-				return res
-					.status(400)
-					.send(
-						"Sorry fella, you can't turn on post notifications for thyself..."
-					);
+				return res.status(400).json({
+					errors: [
+						{
+							msg: "Not allowed",
+							status: "400",
+						},
+					],
+				});
 			}
 
 			// verify that user is following who they wanna turn on notifs for
 			if (
-				user.following.filter(e => e.user.toString() === req.params.userId)
+				user.following.filter((e) => e.user.toString() === req.params.userId)
 					.length === 0
 			) {
-				return res
-					.status(400)
-					.send(
-						"You can't turn on notifications for who you aren't following..."
-					);
+				return res.status(400).json({
+					errors: [{ msg: "Not allowed", status: "400" }],
+				});
 			} else {
-				user.following.forEach(e => {
+				user.following.forEach((e) => {
 					if (e.user.toString() === req.params.userId) {
 						e.notificationsOn = true;
 					}
@@ -265,15 +498,23 @@ router.put(
 
 				await user.save();
 				res.json({
-					msg: "Successfully turned notifications on",
-					following: user.following.filter(
-						e => e.user.toString() === req.params.userId
-					)
+					data: {
+						notificationsOnFor: user.following.filter(
+							(e) => e.user.notificationsOn === true
+						),
+					},
 				});
 			}
 		} catch (err) {
 			if (err.kind === "ObjectId") {
-				return res.status(404).send("This user does not exist");
+				return res.status(404).json({
+					errors: [
+						{
+							msg: "User not found",
+							status: "404",
+						},
+					],
+				});
 			}
 			next(err);
 		}
@@ -281,52 +522,84 @@ router.put(
 );
 
 // turn off notifications
-router.put("/notificationsOff/:userId", authenticator, async (req, res, next) => {
-	try {
-		const following = await User.findById(req.params.userId);
-		const user = await User.findById(req.user.id);
+router.put(
+	"/notificationsOff/:userId",
+	authenticator,
+	async (req, res, next) => {
+		try {
+			const following = await User.findById(req.params.userId);
+			const user = await User.findById(req.user.id);
 
-		if (!following) {
-			return res.status(404).send("This user does not exist!");
-		}
-
-		// verify that user isn't turning off notifications for themselves.
-		if (req.user.id === req.params.userId) {
-			return res
-				.status(400)
-				.send(
-					"Sorry fella, you can't turn off post notifications for thyself..."
-				);
-		}
-
-		if (
-			user.following.filter(e => e.user.toString() === req.params.userId)
-				.length === 0
-		) {
-			return res.status(400).send("You can't turn off notifs for who you aren't following.");
-		}
-    
-		user.following.forEach(e => {
-			if (e.user.toString() === req.params.userId) {
-				e.notificationsOn = false;
+			if (!user) {
+				return res.status(401).json({
+					errors: [
+						{
+							msg: "Not authorized",
+							status: "401",
+						},
+					],
+				});
 			}
-		});
+			if (!following) {
+				return res.status(404).json({
+					errors: [
+						{
+							msg: "User not found",
+							status: "404",
+						},
+					],
+				});
+			}
 
-		await user.save();
-		res.json({
-			msg: "Successfully turned notifications off",
-			following: user.following.filter(
-				e => e.user.toString() === req.params.userId
-			)
-		});
+			// verify that user isn't turning off notifications for themselves.
+			if (req.user.id === req.params.userId) {
+				return res.status(400).json({
+					errors: [
+						{
+							msg: "Not allowed",
+							status: "400",
+						},
+					],
+				});
+			}
 
+			if (
+				user.following.filter((e) => e.user.toString() === req.params.userId)
+					.length === 0
+			) {
+				return res.status(400).json({
+					errors: [{ msg: "Not allowed", status: "400" }],
+				});
+			}
 
-	} catch (err) {
-		if (err.kind === "ObjectId") {
-			return res.status(404).send("This user does not exist");
+			user.following.forEach((e) => {
+				if (e.user.toString() === req.params.userId) {
+					e.notificationsOn = false;
+				}
+			});
+
+			await user.save();
+			res.json({
+				data: {
+					notificationsOnFor: user.following.filter(
+						(e) => e.user.notificationsOn === true
+					),
+				},
+			});
+		} catch (err) {
+			if (err.kind === "ObjectId") {
+				return res.status(404).json({
+					errors: [
+						{
+							msg: "User not found",
+							status: "404",
+						},
+					],
+				});
+			}
+			next(err);
 		}
-		next(err);
 	}
-});
+);
 
 module.exports = router;

@@ -4,19 +4,32 @@ const redUnderline = chalk.red.underline;
 const secret = process.env.JWT_SECRET;
 
 const authenticator = (req, res, next) => {
-	const token = req.header("x-auth-token");
+	const token = req.headers.authorization.split(" ")[1];
 	if (!token) {
-		return res.status(401).send("Not authorized");
+		return res.status(401).json({
+			errors: [
+				{
+					msg: "Not authorized",
+					status: "401",
+				},
+			],
+		});
 	}
 
 	try {
 		const decoded = jwt.verify(token, secret);
 		req.user = decoded.user;
+		next();
 	} catch (err) {
 		console.error(redUnderline(`${err}`));
-		res.status(401).send("Not authorized");
-	} finally {
-		next();
+		return res.status(401).json({
+			errors: [
+				{
+					msg: "Not authorized",
+					status: "401",
+				},
+			],
+		});
 	}
 };
 

@@ -8,9 +8,7 @@ const User = require("../models/User");
 router.post(
 	"/",
 	[
-		check("name", "Field shouldn't be empty")
-			.not()
-			.isEmpty(),
+		check("name", "Field shouldn't be empty").not().isEmpty(),
 		check("email", "Please input a valid email address")
 			.isEmail()
 			.normalizeEmail(),
@@ -21,7 +19,7 @@ router.post(
 		check(
 			"password",
 			"Your password must be at least 8 characters long"
-		).isLength({ min: 8 })
+		).isLength({ min: 8 }),
 	],
 	async (req, res, next) => {
 		const errors = validationResult(req);
@@ -34,10 +32,24 @@ router.post(
 			const checkUsername = await User.findOne({ username });
 
 			if (checkEmail) {
-				return res.status(400).send("user with this email already exists");
+				return res.status(400).json({
+					errors: [
+						{
+							msg: "Email has already been taken",
+							status: "400",
+						},
+					],
+				});
 			}
 			if (checkUsername) {
-				return res.status(400).send("Username not available");
+				return res.status(400).json({
+					errors: [
+						{
+							msg: "Username has already taken",
+							status: "400",
+						},
+					],
+				});
 			}
 
 			const salt = await bcrypt.genSalt();
@@ -47,11 +59,15 @@ router.post(
 				name,
 				email,
 				username,
-				password: hashedPassword
+				password: hashedPassword,
 			});
 
 			await user.save();
-			res.status(200).send("Account successfully created");
+			res.status(200).json({
+				data: {
+					msg: "Account successfully created",
+				},
+			});
 		} catch (err) {
 			next(err);
 		}

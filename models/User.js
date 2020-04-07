@@ -3,90 +3,96 @@ const mongoose = require("mongoose");
 const UserSchema = new mongoose.Schema({
 	name: {
 		type: String,
-		required: true
+		required: true,
 	},
 	email: {
 		type: String,
 		required: true,
-		unique: true
+		unique: true,
 	},
 	username: {
 		type: String,
 		required: true,
-		unique: true
+		unique: true,
 	},
 	password: {
 		type: String,
-		required: true
+		required: true,
 	},
 	resetToken: String,
 	resetTokenExpiration: String,
 	bio: {
 		about: {
-			type: String
+			type: String,
 		},
 		dateOfBirth: {
-			type: Date
+			type: Date,
 		},
 		website: {
-			type: String
+			type: String,
 		},
 		joined: {
 			type: Date,
-			default: Date.now
-		}
+			default: Date.now,
+		},
 	},
 	followers: [
 		{
 			type: mongoose.Schema.Types.ObjectId,
-			ref: "users"
-		}
+			ref: "users",
+		},
 	],
 	following: [
 		{
 			user: {
 				type: mongoose.Schema.Types.ObjectId,
-				ref: "users"
+				ref: "users",
 			},
 			notificationsOn: {
 				type: Boolean,
-				default: false
-			}
-		}
+				default: false,
+			},
+		},
 	],
 	blocked: [
 		{
 			type: mongoose.Schema.Types.ObjectId,
-			ref: "users"
-		}
+			ref: "users",
+		},
+	],
+	blockedMe: [
+		{
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "users",
+		},
 	],
 	muted: [
 		{
 			type: mongoose.Schema.Types.ObjectId,
-			ref: "users"
-		}
+			ref: "users",
+		},
 	],
 	// with retweets
 	tweets: [
 		{
 			type: mongoose.Schema.Types.ObjectId,
-			ref: "posts"
-		}
+			ref: "posts",
+		},
 	],
 	likes: [
 		{
 			type: mongoose.Schema.Types.ObjectId,
-			ref: "posts"
-		}
+			ref: "posts",
+		},
 	],
 	date: {
 		type: Date,
-		default: Date.now
-	}
+		default: Date.now,
+	},
 });
 
 // method to add date of birth
-UserSchema.methods.changeDateOfBirth = function(date) {
+UserSchema.methods.changeDateOfBirth = function (date) {
 	const toDate = new Date(date);
 	this.bio.dateOfBirth = toDate.toISOString();
 
