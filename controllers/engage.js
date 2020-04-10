@@ -1,20 +1,12 @@
 const User = require("../models/User");
+const checkIfNotUser = require("../utils/checkIfNotUser");
 
 // Follow a user
 exports.follow = async (req, res, next) => {
 	try {
 		const userToFollow = await User.findById(req.params.userId);
 		const user = await User.findById(req.user.id);
-		if (!user) {
-			return res.status(401).json({
-				errors: [
-					{
-						msg: "Not authorized",
-						status: "401",
-					},
-				],
-			});
-		}
+		checkIfNotUser(user, res);
 		if (!userToFollow) {
 			return res.status(404).json({
 				errors: [
@@ -31,7 +23,7 @@ exports.follow = async (req, res, next) => {
 			return res.status(400).json({
 				errors: [
 					{
-						msg: "Not allowed",
+						msg: "You can't follow yourself",
 						status: "400",
 					},
 				],
@@ -46,7 +38,7 @@ exports.follow = async (req, res, next) => {
 			return res.status(400).json({
 				errors: [
 					{
-						msg: "Not allowed",
+						msg: "You're already following this user",
 						status: "400",
 					},
 				],
@@ -81,16 +73,7 @@ exports.unfollow = async (req, res, next) => {
 	try {
 		const userToUnfollow = await User.findById(req.params.userId);
 		const user = await User.findById(req.user.id);
-		if (!user) {
-			return res.status(401).json({
-				errors: [
-					{
-						msg: "Not authorized",
-						status: "401",
-					},
-				],
-			});
-		}
+		checkIfNotUser(user, res);
 		if (!userToUnfollow) {
 			return res.status(404).json({
 				errors: [
@@ -107,7 +90,7 @@ exports.unfollow = async (req, res, next) => {
 			return res.status(400).json({
 				errors: [
 					{
-						msg: "Not allowed",
+						msg: "You can't unfollow yourself",
 						status: "400",
 					},
 				],
@@ -122,7 +105,7 @@ exports.unfollow = async (req, res, next) => {
 			return res.status(400).json({
 				errors: [
 					{
-						msg: "Not allowed",
+						msg: "You're not following this user",
 						status: "400",
 					},
 				],
@@ -165,16 +148,7 @@ exports.block = async (req, res, next) => {
 	try {
 		const userToBlock = await User.findById(req.params.userId);
 		const user = await User.findById(req.user.id);
-		if (!user) {
-			return res.status(401).json({
-				errors: [
-					{
-						msg: "Not authorized",
-						status: "401",
-					},
-				],
-			});
-		}
+		checkIfNotUser(user, res);
 		if (!userToBlock) {
 			return res.status(404).json({
 				errors: [
@@ -206,7 +180,7 @@ exports.block = async (req, res, next) => {
 			return res.status(400).json({
 				errors: [
 					{
-						msg: "Not allowed",
+						msg: "This user has already been blocked",
 						status: "401",
 					},
 				],
@@ -258,7 +232,7 @@ exports.unblock = async (req, res, next) => {
 			return res.status(400).json({
 				errors: [
 					{
-						msg: "Not allowed",
+						msg: "You can't unblock yourself",
 						status: "400",
 					},
 				],
@@ -273,7 +247,7 @@ exports.unblock = async (req, res, next) => {
 			return res.status(400).json({
 				errors: [
 					{
-						msg: "Not allowed",
+						msg: "You've not blocked this user",
 						status: "40",
 					},
 				],
@@ -315,16 +289,7 @@ exports.mute = async (req, res, next) => {
 	try {
 		const userToMute = await User.findById(req.params.userId);
 		const user = await User.findById(req.user.id);
-		if (!user) {
-			return res.status(401).json({
-				errors: [
-					{
-						msg: "Not authorized",
-						status: "401",
-					},
-				],
-			});
-		}
+		checkIfNotUser(user, res);
 		if (!userToMute) {
 			return res.status(404).json({
 				errors: [
@@ -341,7 +306,7 @@ exports.mute = async (req, res, next) => {
 			return res.status(400).json({
 				errors: [
 					{
-						msg: "Not allowed",
+						msg: "You can't mute yourself",
 						status: "400",
 					},
 				],
@@ -355,7 +320,7 @@ exports.mute = async (req, res, next) => {
 			return res.status(400).json({
 				errors: [
 					{
-						msg: "Not allowed",
+						msg: "This user hasn't been muted",
 						status: "400",
 					},
 				],
@@ -380,11 +345,7 @@ exports.unmute = async (req, res, next) => {
 	try {
 		const userToUnmute = await User.findById(req.params.userId);
 		const user = await User.findById(req.user.id);
-		if (!user) {
-			return res.status(401).json({
-				errors: [{ msg: "Not authorized", status: "401" }],
-			});
-		}
+		checkIfNotUser(user, res);
 		if (!userToUnmute) {
 			return res.status(404).json({
 				errors: [{ msg: "User not found", status: "404" }],
@@ -396,7 +357,7 @@ exports.unmute = async (req, res, next) => {
 			return res.status(400).json({
 				errors: [
 					{
-						msg: "Not allowed",
+						msg: "You can't unmute yourself",
 						status: "400",
 					},
 				],
@@ -408,7 +369,7 @@ exports.unmute = async (req, res, next) => {
 			user.muted.filter((e) => e.toString() === req.params.userId).length === 0
 		) {
 			return res.status(400).json({
-				errors: [{ msg: "Not allowed" }],
+				errors: [{ msg: "This user hasn't been muted" }],
 			});
 		}
 
@@ -434,16 +395,7 @@ exports.notificationsOn = async (req, res, next) => {
 		const following = await User.findById(req.params.userId);
 		const user = await User.findById(req.user.id);
 
-		if (!user) {
-			return res.status(401).json({
-				errors: [
-					{
-						msg: "Not authorized",
-						status: "401",
-					},
-				],
-			});
-		}
+		checkIfNotUser(user, res);
 		if (!following) {
 			return res.status(404).json({
 				errors: [
@@ -460,7 +412,7 @@ exports.notificationsOn = async (req, res, next) => {
 			return res.status(400).json({
 				errors: [
 					{
-						msg: "Not allowed",
+						msg: "Can't turn on notifications for yourself",
 						status: "400",
 					},
 				],
@@ -473,7 +425,7 @@ exports.notificationsOn = async (req, res, next) => {
 				.length === 0
 		) {
 			return res.status(400).json({
-				errors: [{ msg: "Not allowed", status: "400" }],
+				errors: [{ msg: "Must follow user before turning on notifications", status: "400" }],
 			});
 		} else {
 			user.following.forEach((e) => {
@@ -512,16 +464,7 @@ exports.notificationsOff = async (req, res, next) => {
 		const following = await User.findById(req.params.userId);
 		const user = await User.findById(req.user.id);
 
-		if (!user) {
-			return res.status(401).json({
-				errors: [
-					{
-						msg: "Not authorized",
-						status: "401",
-					},
-				],
-			});
-		}
+		checkIfNotUser(user, res);
 		if (!following) {
 			return res.status(404).json({
 				errors: [
@@ -538,7 +481,7 @@ exports.notificationsOff = async (req, res, next) => {
 			return res.status(400).json({
 				errors: [
 					{
-						msg: "Not allowed",
+						msg: "Can't turn off notifications for yourself",
 						status: "400",
 					},
 				],
@@ -550,7 +493,7 @@ exports.notificationsOff = async (req, res, next) => {
 				.length === 0
 		) {
 			return res.status(400).json({
-				errors: [{ msg: "Not allowed", status: "400" }],
+				errors: [{ msg: "Must be following user before turning off notifications", status: "400" }],
 			});
 		}
 

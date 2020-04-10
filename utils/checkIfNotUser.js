@@ -3,8 +3,8 @@ const checkIfNotUser = (user, res) => {
 		return res.status(401).json({
 			errors: [
 				{
-					msg: "Not allowed",
-					status: "401",
+					msg: "Forbidden",
+					status: "403",
 				},
 			],
 		});

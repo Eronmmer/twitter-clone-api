@@ -186,7 +186,7 @@ exports.editTweet = async (req, res, next) => {
 			return res.status(403).json({
 				errors: [
 					{
-						msg: "You're not allowed to do this",
+						msg: "Forbidden",
 						status: "403",
 					},
 				],
@@ -229,7 +229,7 @@ exports.likeTweet = async (req, res, next) => {
 			return res.status(400).json({
 				errors: [
 					{
-						msg: "Not allowed",
+						msg: "Already liked",
 						status: "400",
 					},
 				],
@@ -277,7 +277,7 @@ exports.unlikeTweet = async (req, res, next) => {
 			return res.status(400).json({
 				errors: [
 					{
-						msg: "Not allowed",
+						msg: "Tweet hasn't been liked",
 						status: "400",
 					},
 				],
@@ -380,7 +380,7 @@ exports.retweet = async (req, res, next) => {
 			return res.status(400).json({
 				errors: [
 					{
-						msg: "Not allowed",
+						msg: "Already retweeted",
 						status: "400",
 					},
 				],
@@ -473,7 +473,7 @@ exports.deleteTweet = async (req, res, next) => {
 			return res.status(403).json({
 				errors: [
 					{
-						msg: "You're not allowed to do this",
+						msg: "Forbidden",
 						status: "403",
 					},
 				],
