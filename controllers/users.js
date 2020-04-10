@@ -1,7 +1,12 @@
 const User = require("../models/User");
 const Post = require("../models/Post");
 const Comment = require("../models/Comment");
-const { checkIfNotUser, objectIdError } = require("../utils");
+const {
+	checkIfNotUser,
+	objectIdError,
+	checkIfAuthenticated,
+	checkIfBlocked
+} = require("../utils");
 
 // Get all the tweets of a user including retweets and replies(optional)
 exports.allTweets = async (req, res, next) => {
@@ -9,6 +14,12 @@ exports.allTweets = async (req, res, next) => {
 		const user = req.params.userId;
 		const findUser = await User.findById(user);
 		checkIfNotUser(findUser, res, "public");
+		// if authenticated, check if user blocked requester
+		if (checkIfAuthenticated(req)) {
+			const authenticatedUser = await User.findById(req.user.id);
+			checkIfNotUser(authenticatedUser, res);
+			checkIfBlocked(res, authenticatedUser, findUser);
+		}
 		const userTweets = await Post.find({
 			user,
 		}).sort({ date: -1 });
@@ -49,6 +60,12 @@ exports.allLikes = async (req, res, next) => {
 		const user = req.params.userId;
 		const findUser = await User.findById(user);
 		checkIfNotUser(findUser, res, "public");
+		// if authenticated, check if user blocked requester
+		if (checkIfAuthenticated(req)) {
+			const authenticatedUser = await User.findById(req.user.id);
+			checkIfNotUser(authenticatedUser, res);
+			checkIfBlocked(res, authenticatedUser, findUser);
+		}
 		const postLikes = await Post.find({
 			likes: user,
 		}).sort({ date: -1 });

@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const authenticator = require("../middleware/authenticator");
-const { allTweets, allLikes, getBio, editBio } = require("../controllers/users");
+const { allTweets, allLikes, getBio, editBio} = require("../controllers/users");
 
 /*
  * @desc Get all tweets of a user including retweets.
