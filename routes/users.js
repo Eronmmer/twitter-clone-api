@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const authenticator = require("../middleware/authenticator");
-const { allTweets, allLikes, getBio, editBio} = require("../controllers/users");
+const { allTweets, allLikes, getBio, editBio, getProfile} = require("../controllers/users");
 
 /*
  * @desc Get all tweets of a user including retweets.
@@ -20,11 +20,18 @@ router.get("/tweets/:userId", allTweets);
 router.get("/likes/:userId", allLikes);
 
 /*
- * @desc Get bio of any user
+ * @desc Get bio/profile of any user by their username
  * @method GET
  * @api public
  */
-router.get("/bio/:userId", getBio);
+router.get("/bio/:username", getBio);
+
+/*
+ * @desc Get current user's profile
+ * @method GET
+ * @api private
+ */
+router.get("/profile", authenticator, getProfile);
 
 /*
  * @desc Edit the current user bio

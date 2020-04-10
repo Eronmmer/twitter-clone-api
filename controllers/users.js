@@ -5,7 +5,7 @@ const {
 	checkIfNotUser,
 	objectIdError,
 	checkIfAuthenticated,
-	checkIfBlocked
+	checkIfBlocked,
 } = require("../utils");
 
 // Get all the tweets of a user including retweets and replies(optional)
@@ -86,13 +86,13 @@ exports.allLikes = async (req, res, next) => {
 	}
 };
 
-// Get the bio of any user
+// Get the bio of any user by their username
 exports.getBio = async (req, res, next) => {
 	try {
-		const user = await User.findById(req.params.userId);
-		checkIfNotUser(user, res, "public");
-		const bio = user.bio;
-		res.json({ data: { bio } });
+		const findUser = await User.findOne({username: req.params.username});
+		checkIfNotUser(findUser, res, "public");
+		const { id, name, user, username, followers, following, bio } = findUser;
+		res.json({ data: { id, name, user, username, bio, followers, following } });
 	} catch (err) {
 		objectIdError(res, err, "User not found");
 		next(err);
@@ -120,6 +120,52 @@ exports.editBio = async (req, res, next) => {
 		res.status(200).json({
 			data: {
 				bio: user.bio,
+			},
+		});
+	} catch (err) {
+		next(err);
+	}
+};
+
+// Get the profile of current user
+exports.getProfile = async (req, res, next) => {
+	try {
+		const findUser = await User.findById(req.user.id);
+		checkIfNotUser(findUser, res);
+		if (findUser.id.toString() !== req.user.id) {
+			return res.status(403).json({
+				errors: [
+					{
+						msg: "Forbidden",
+						status: "403",
+					},
+				],
+			});
+		}
+		const {
+			id,
+			name,
+			user,
+			username,
+			followers,
+			following,
+			bio,
+			blocked,
+			blockedMe,
+			muted,
+		} = findUser;
+		res.json({
+			data: {
+				id,
+				name,
+				user,
+				username,
+				bio,
+				followers,
+				following,
+				blocked,
+				blockedMe,
+				muted,
 			},
 		});
 	} catch (err) {

@@ -8,8 +8,8 @@ const checkIfNotUser = (user, res, type = "private") => {
 				},
 			],
 		});
-	} else {
-		return res.status(401).json({
+	} else if(!user && type === "private") {
+		return res.status(403).json({
 			errors: [
 				{
 					msg: "Forbidden",
