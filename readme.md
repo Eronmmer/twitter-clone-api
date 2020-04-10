@@ -1,18 +1,18 @@
 # Twitter clone API
 
-In an attempt to mimic the backend architecture of Twitter while practicing Express and Node.js. 
+This is a project I built while learning Node.js/Express and MongoDB. A REST API with most of Twitter's main features.
 
-Chill, it's just a REST API with only few of Twitter's features 😂 
 
 ## Features
 
-- Login, Signup, change of details(password, bio, profile picture)
-- Anyone can view tweets
-- Authenticated users can make tweets, like, comment, retweet, block other users, mute, unfollow and follow other users
+- Authentication/Authorization
+- Users can create, edit, like, retweet and quote tweets.
+- Users can follow, unfollow, mute, block, unblock, turn on and off notifications of users.
+- Others coming ⚡
 
 ## Usage
 
-First go to the `sample.env` file and follow the instructions there.
+Go to the `.sample.env` file in the root directory and create your own `.evn` file.
 
 **Install dependencies:**
 
@@ -26,8 +26,6 @@ npm i
 npm run dev
 ```
 
-Your console will tell you on which port the app is running
-
 **start**
 
 ```bash
@@ -36,10 +34,12 @@ npm start
 
 **test:**
 
-```bash
+> coming soon ⚡
+<!-- ```bash
 npm run test
-```
+``` -->
 
-## Endpoints
+## API Documentation
 
+> coming soon ⚡
 <!-- add endpoints here -->
