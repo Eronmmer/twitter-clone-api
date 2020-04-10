@@ -12,7 +12,7 @@ This is a project I built while learning Node.js/Express and MongoDB. A REST API
 
 ## Usage
 
-Go to the `.sample.env` file in the root directory and create your own `.evn` file.
+Go to the `.sample.env` file in the root directory and create your own `.env` file.
 
 **Install dependencies:**
 
