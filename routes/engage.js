@@ -68,7 +68,7 @@ router.put("/unmute/:userId", authenticator, unmute);
  * @api private
 */
 router.put(
-	"/notificationsOn/:userId",
+	"/notifications-on/:userId",
 	authenticator, notificationsOn
 );
 
@@ -78,7 +78,7 @@ router.put(
  * @api private
 */
 router.put(
-	"/notificationsOff/:userId",
+	"/notifications-off/:userId",
 	authenticator, notificationsOff
 );
 

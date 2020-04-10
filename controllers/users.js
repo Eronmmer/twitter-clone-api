@@ -1,70 +1,15 @@
-const { validationResult } = require("express-validator");
-const bcrypt = require("bcryptjs");
 const User = require("../models/User");
 const Post = require("../models/Post");
 const Comment = require("../models/Comment");
-const { checkIfNotUser } = require("../utils");
-
-// Register a user
-exports.register = async (req, res, next) => {
-	const errors = validationResult(req);
-	if (!errors.isEmpty()) {
-		return res.status(422).json({ errors: errors.array() });
-	}
-	const { name, email, username, password } = req.body;
-	try {
-		const checkEmail = await User.findOne({ email });
-		const checkUsername = await User.findOne({ username });
-
-		if (checkEmail) {
-			return res.status(400).json({
-				errors: [
-					{
-						msg: "Email has already been taken",
-						status: "400",
-					},
-				],
-			});
-		}
-		if (checkUsername) {
-			return res.status(400).json({
-				errors: [
-					{
-						msg: "Username has already taken",
-						status: "400",
-					},
-				],
-			});
-		}
-
-		const salt = await bcrypt.genSalt();
-		const hashedPassword = await bcrypt.hash(password, salt);
-
-		const user = new User({
-			name,
-			email,
-			username,
-			password: hashedPassword,
-		});
-
-		await user.save();
-		res.status(200).json({
-			data: {
-				msg: "Account successfully created",
-			},
-		});
-	} catch (err) {
-		next(err);
-	}
-};
+const { checkIfNotUser, objectIdError } = require("../utils");
 
 // Get all the tweets of a user including retweets and replies(optional)
 exports.allTweets = async (req, res, next) => {
 	try {
-		const user = req.user.id;
+		const user = req.params.userId;
 		const findUser = await User.findById(user);
-		checkIfNotUser(findUser, res);
-		const ownTweets = await Post.find({
+		checkIfNotUser(findUser, res, "public");
+		const userTweets = await Post.find({
 			user,
 		}).sort({ date: -1 });
 		const comments = await Comment.find({
@@ -77,7 +22,7 @@ exports.allTweets = async (req, res, next) => {
 			retweets: user,
 		}).sort({ date: -1 });
 
-		const tweets = [...ownTweets, ...postRetweets, ...commentRetweets].sort(
+		const tweets = [...userTweets, ...postRetweets, ...commentRetweets].sort(
 			(a, b) => b.date - a.date
 		);
 		const tweetsWithReplies = [...tweets, ...comments].sort(
@@ -93,6 +38,7 @@ exports.allTweets = async (req, res, next) => {
 			});
 		}
 	} catch (err) {
+		objectIdError(res, err, "User not found");
 		next(err);
 	}
 };
@@ -100,9 +46,9 @@ exports.allTweets = async (req, res, next) => {
 // Get all likes of a user
 exports.allLikes = async (req, res, next) => {
 	try {
-		const user = req.user.id;
+		const user = req.params.userId;
 		const findUser = await User.findById(user);
-		checkIfNotUser(findUser, res);
+		checkIfNotUser(findUser, res, "public");
 		const postLikes = await Post.find({
 			likes: user,
 		}).sort({ date: -1 });
@@ -116,6 +62,48 @@ exports.allLikes = async (req, res, next) => {
 
 		res.json({
 			data: likes,
+		});
+	} catch (err) {
+		objectIdError(res, err, "User not found");
+		next(err);
+	}
+};
+
+// Get the bio of any user
+exports.getBio = async (req, res, next) => {
+	try {
+		const user = await User.findById(req.params.userId);
+		checkIfNotUser(user, res, "public");
+		const bio = user.bio;
+		res.json({ data: { bio } });
+	} catch (err) {
+		objectIdError(res, err, "User not found");
+		next(err);
+	}
+};
+
+// Edit bio of current user
+exports.editBio = async (req, res, next) => {
+	const { about, dateOfBirth, website } = req.body;
+	try {
+		const user = await User.findById(req.user.id);
+		checkIfNotUser(user, res);
+		if (about) {
+			user.bio.about = about;
+			await user.save();
+		}
+		if (dateOfBirth) {
+			user.bio.dateOfBirth = dateOfBirth;
+			await user.save();
+		}
+		if (website) {
+			user.bio.website = website;
+			await user.save();
+		}
+		res.status(200).json({
+			data: {
+				bio: user.bio,
+			},
 		});
 	} catch (err) {
 		next(err);

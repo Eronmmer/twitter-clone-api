@@ -53,7 +53,7 @@ router.post(
  * @api private
  */
 router.put(
-	"/content/:tweetId",
+	"/:tweetId",
 	[
 		check("postContent", "Please add a post content").not().isEmpty(),
 		authenticator,

@@ -2,7 +2,7 @@ const Post = require("../models/Post");
 const User = require("../models/User");
 const Comment = require("../models/Comment");
 const { validationResult } = require("express-validator");
-const { checkIfNotUser } = require("../utils");
+const { checkIfNotUser, objectIdError } = require("../utils");
 
 exports.getTweet = async (req, res, next) => {
 	try {
@@ -72,16 +72,7 @@ exports.getTweet = async (req, res, next) => {
 			});
 		}
 	} catch (err) {
-		if (err.kind === "ObjectId") {
-			return res.status(404).json({
-				errors: [
-					{
-						msg: "Tweet not found",
-						status: "404",
-					},
-				],
-			});
-		}
+		objectIdError(res, err, "Tweet not found");
 		next(err);
 	}
 };
@@ -147,16 +138,7 @@ exports.quoteTweet = async (req, res, next) => {
 		await tweetToQuote.save();
 		res.json({ data: { tweet, quoted: tweetToQuote } });
 	} catch (err) {
-		if (err.kind === "ObjectId") {
-			return res.status(404).json({
-				errors: [
-					{
-						msg: "Tweet not found",
-						status: "404",
-					},
-				],
-			});
-		}
+		objectIdError(res, err, "Tweet not found");
 		next(err);
 	}
 };
@@ -199,16 +181,7 @@ exports.editTweet = async (req, res, next) => {
 		await tweet.save();
 		res.json({ data: { tweet } });
 	} catch (err) {
-		if (err.kind === "ObjectId") {
-			return res.status(404).json({
-				errors: [
-					{
-						msg: "Tweet not found",
-						status: "404",
-					},
-				],
-			});
-		}
+		objectIdError(res, err, "Tweet not found");
 		next(err);
 	}
 };
@@ -239,16 +212,7 @@ exports.likeTweet = async (req, res, next) => {
 		await tweet.save();
 		res.json({ data: { likes: tweet.likes } });
 	} catch (err) {
-		if (err.kind === "ObjectId") {
-			return res.status(404).json({
-				errors: [
-					{
-						msg: "Tweet not found",
-						status: "404",
-					},
-				],
-			});
-		}
+		objectIdError(res, err, "Tweet not found");
 		next(err);
 	}
 };
@@ -288,16 +252,7 @@ exports.unlikeTweet = async (req, res, next) => {
 		tweet.save();
 		res.json({ data: { likes: tweet.likes } });
 	} catch (err) {
-		if (err.kind === "ObjectId") {
-			return res.status(404).json({
-				errors: [
-					{
-						msg: "Tweet not found",
-						status: "404",
-					},
-				],
-			});
-		}
+		objectIdError(res, err, "Tweet not found");
 		next(err);
 	}
 };
@@ -341,16 +296,7 @@ exports.commentOnTweet = async (req, res, next) => {
 			},
 		});
 	} catch (err) {
-		if (err.kind === "ObjectId") {
-			return res.status(404).json({
-				errors: [
-					{
-						msg: "Tweet not found",
-						status: "404",
-					},
-				],
-			});
-		}
+		objectIdError(res, err, "Tweet not found");
 		next(err);
 	}
 };
@@ -390,16 +336,7 @@ exports.retweet = async (req, res, next) => {
 		await tweet.save();
 		res.json({ data: { retweets: tweet.retweets } });
 	} catch (err) {
-		if (err.kind === "ObjectId") {
-			return res.status(404).json({
-				errors: [
-					{
-						msg: "Tweet not found",
-						status: "404",
-					},
-				],
-			});
-		}
+		objectIdError(res, err, "Tweet not found");
 		next(err);
 	}
 };
@@ -437,16 +374,7 @@ exports.undoRetweet = async (req, res, next) => {
 		tweet.save();
 		res.json({ data: { retweets: tweet.retweets } });
 	} catch (err) {
-		if (err.kind === "ObjectId") {
-			return res.status(404).json({
-				errors: [
-					{
-						msg: "Tweet not found",
-						status: "404",
-					},
-				],
-			});
-		}
+		objectIdError(res, err, "Tweet not found");
 		next(err);
 	}
 };
@@ -486,16 +414,7 @@ exports.deleteTweet = async (req, res, next) => {
 			},
 		});
 	} catch (err) {
-		if (err.kind === "ObjectId") {
-			return res.status(404).json({
-				errors: [
-					{
-						msg: "Tweet not found",
-						status: "404",
-					},
-				],
-			});
-		}
+		objectIdError(res, err, "Tweet not found");
 		next(err);
 	}
 };

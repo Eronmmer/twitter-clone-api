@@ -1,5 +1,5 @@
 const User = require("../models/User");
-const checkIfNotUser = require("../utils/checkIfNotUser");
+const {checkIfNotUser} = require("../utils");
 
 // Follow a user
 exports.follow = async (req, res, next) => {
