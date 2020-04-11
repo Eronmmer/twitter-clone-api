@@ -5,6 +5,7 @@ const checkIfNotUser = require("./checkIfNotUser");
 const objectIdError = require("./objectIdError");
 const checkIfAuthenticated = require("./checkIfAuthenticated");
 const checkIfBlocked = require("./checkIfBlocked");
+const reservedUsernames = require("./reservedUsernames");
 
 module.exports = {
 	applyRoutes,
@@ -13,5 +14,6 @@ module.exports = {
 	checkIfNotUser,
 	objectIdError,
 	checkIfAuthenticated,
-	checkIfBlocked
+	checkIfBlocked,
+	reservedUsernames
 };

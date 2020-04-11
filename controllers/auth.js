@@ -3,6 +3,7 @@ const secret = process.env.JWT_SECRET;
 const bcrypt = require("bcryptjs");
 const { validationResult } = require("express-validator");
 const User = require("../models/User");
+const { reservedUsernames } = require("../utils");
 
 // Register a user
 exports.register = async (req, res, next) => {
@@ -36,6 +37,17 @@ exports.register = async (req, res, next) => {
 			});
 		}
 
+		if (reservedUsernames.includes(username.toLowerCase())) {
+			return res.status(400).json({
+				errors: [
+					{
+						msg: "This username is unavailable.",
+						status: "400",
+					},
+				],
+			});
+		}
+
 		const salt = await bcrypt.genSalt();
 		const hashedPassword = await bcrypt.hash(password, salt);
 
@@ -60,7 +72,10 @@ exports.register = async (req, res, next) => {
 // Login user
 exports.login = async (req, res, next) => {
 	const { email, password } = req.body;
-
+	const errors = validationResult(req);
+	if (!errors.isEmpty()) {
+		return res.status(422).json({ errors: errors.array() });
+	}
 	try {
 		const user = await User.findOne({ email });
 		if (!user) {
@@ -118,7 +133,7 @@ exports.getUser = async (req, res, next) => {
 					name,
 					email,
 					username,
-					id
+					id,
 				},
 			},
 		});

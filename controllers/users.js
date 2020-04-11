@@ -1,11 +1,13 @@
 const User = require("../models/User");
 const Post = require("../models/Post");
 const Comment = require("../models/Comment");
+const { validationResult } = require("express-validator");
 const {
 	checkIfNotUser,
 	objectIdError,
 	checkIfAuthenticated,
 	checkIfBlocked,
+	reservedUsernames,
 } = require("../utils");
 
 // Get all the tweets of a user including retweets and replies(optional)
@@ -89,7 +91,7 @@ exports.allLikes = async (req, res, next) => {
 // Get the bio of any user by their username
 exports.getBio = async (req, res, next) => {
 	try {
-		const findUser = await User.findOne({username: req.params.username});
+		const findUser = await User.findOne({ username: req.params.username });
 		checkIfNotUser(findUser, res, "public");
 		const { id, name, user, username, followers, following, bio } = findUser;
 		res.json({ data: { id, name, user, username, bio, followers, following } });
@@ -166,6 +168,80 @@ exports.getProfile = async (req, res, next) => {
 				blocked,
 				blockedMe,
 				muted,
+			},
+		});
+	} catch (err) {
+		next(err);
+	}
+};
+
+// change name of logged in user
+exports.changeName = async (req, res, next) => {
+	const { name } = req.body;
+	const errors = validationResult(req);
+	if (!errors.isEmpty()) {
+		return res.status(422).json({ errors: errors.array() });
+	}
+	try {
+		const findUser = await User.findById(req.user.id);
+		checkIfNotUser(findUser, res);
+		if (findUser.id.toString() !== req.user.id) {
+			return res.status(403).json({
+				errors: [
+					{
+						msg: "Forbidden",
+						status: "403",
+					},
+				],
+			});
+		}
+		findUser.name = name;
+		await findUser.save();
+		res.json({
+			data: {
+				name: findUser.name,
+			},
+		});
+	} catch (err) {
+		next(err);
+	}
+};
+
+// change username of logged in user
+exports.changeUsername = async (req, res, next) => {
+	const { username } = req.body;
+	const errors = validationResult(req);
+	if (!errors.isEmpty()) {
+		return res.status(422).json({ errors: errors.array() });
+	}
+	try {
+		const findUser = await User.findById(req.user.id);
+		checkIfNotUser(findUser, res);
+		if (findUser.id.toString() !== req.user.id) {
+			return res.status(403).json({
+				errors: [
+					{
+						msg: "Forbidden",
+						status: "403",
+					},
+				],
+			});
+		}
+		if (reservedUsernames.includes(username.toLowerCase())) {
+			return res.status(400).json({
+				errors: [
+					{
+						msg: "This username is unavailable.",
+						status: "400",
+					},
+				],
+			});
+		}
+		findUser.username = username;
+		await findUser.save();
+		res.json({
+			data: {
+				username: findUser.username,
 			},
 		});
 	} catch (err) {
