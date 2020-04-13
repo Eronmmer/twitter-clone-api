@@ -4,7 +4,6 @@ const Comment = require("../models/Comment");
 const {
 	checkIfAuthenticated,
 	checkIfNotUser,
-	checkIfBlocked,
 } = require("../utils");
 
 // search for tweets
@@ -93,12 +92,20 @@ exports.search = async (req, res, next) => {
 			if (checkIfAuthenticated(req)) {
 				const authenticatedUser = await User.findById(req.user.id);
 				checkIfNotUser(authenticatedUser, res);
-				all.forEach(async (e, i) => {
-					const user = await User.findById(e.user);
-					if (user.blocked.includes(req.user.id)) {
-						all.splice(i, 1);
-					}
-				});
+				// check this gymnastics here during testing---------
+				try {
+					all.forEach(async (e, i) => {
+						const user = await User.findById(e.user);
+						if (user.blocked.includes(req.user.id)) {
+							all.splice(i, 1);
+						}
+					});
+				} catch (err) {
+					console.log(err);
+					return res.json({
+						data: all,
+					});
+				}
 			}
 			return res.json({
 				data: all,
