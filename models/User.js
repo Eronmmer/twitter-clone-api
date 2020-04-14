@@ -26,23 +26,21 @@ const UserSchema = new mongoose.Schema({
 	avatar: {
 		url: {
 			type: String,
-			default:
-				"https://res.cloudinary.com/twittr/image/upload/v1586895328/media/default_zszxma.png",
+			default: process.env.DEFAULT_AVATAR_URL,
 		},
 		id: {
 			type: String,
-			default: "media/default_zszxma",
+			default: process.env.DEFAULT_AVATAR_ID,
 		},
 	},
 	coverImage: {
 		url: {
 			type: String,
-			default:
-				"https://res.cloudinary.com/twittr/image/upload/v1586895816/media/cover_i5waru.jpg",
+			default: process.env.DEFAULT_COVER_URL,
 		},
 		id: {
 			type: String,
-			default: "media/cover_i5waru",
+			default: process.env.DEFAULT_COVER_ID,
 		},
 	},
 	// resetToken: String,

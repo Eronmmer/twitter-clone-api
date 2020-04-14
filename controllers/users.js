@@ -303,9 +303,49 @@ exports.changeCoverImage = async (req, res, next) => {
 		checkIfNotUser(user, res);
 		const url = req.file.url;
 		const id = req.file.public_id;
-		user.avatar.url = url;
-		user.avatar.id = id;
+		user.coverImage.url = url;
+		user.coverImage.id = id;
 		await user.save();
+		res.json({
+			data: {
+				url,
+			},
+		});
+	} catch (err) {
+		next(err);
+	}
+};
+
+// Remove avatar of current user
+exports.removeAvatar = async (req, res, next) => {
+	try {
+		const user = await User.findById(req.user.id);
+		checkIfNotUser(user, res);
+		user.avatar.url = process.env.DEFAULT_AVATAR_URL;
+		user.avatar.id = process.env.DEFAULT_AVATAR_ID;
+
+		await user.save();
+		const { url } = user.avatar;
+		res.json({
+			data: {
+				url,
+			},
+		});
+	} catch (err) {
+		next(err);
+	}
+};
+
+// Remove cover image of current user
+exports.removeCoverImage = async (req, res, next) => {
+	try {
+		const user = await User.findById(req.user.id);
+		checkIfNotUser(user, res);
+		user.coverImage.url = process.env.DEFAULT_COVER_URL;
+		user.coverImage.id = process.env.DEFAULT_COVER_ID;
+
+		await user.save();
+		const { url } = user.coverImage;
 		res.json({
 			data: {
 				url,
