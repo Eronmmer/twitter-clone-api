@@ -16,12 +16,7 @@ const PostSchema = new mongoose.Schema({
 			maxlength: 280
 		},
 		media: {
-			mediaLink: {
-				type: String
-			},
-			typeOfMedia: {
-				type: String
-			}
+			type: String
 		}
 	},
 	likes: [

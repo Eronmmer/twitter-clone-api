@@ -4,23 +4,49 @@ const UserSchema = new mongoose.Schema({
 	name: {
 		type: String,
 		required: true,
+		trim: true,
 	},
 	email: {
 		type: String,
 		required: true,
 		unique: true,
+		lowercase: true,
+		trim: true,
 	},
 	username: {
 		type: String,
 		required: true,
 		unique: true,
+		trim: true,
 	},
 	password: {
 		type: String,
 		required: true,
 	},
-	resetToken: String,
-	resetTokenExpiration: String,
+	avatar: {
+		url: {
+			type: String,
+			default:
+				"https://res.cloudinary.com/twittr/image/upload/v1586895328/media/default_zszxma.png",
+		},
+		id: {
+			type: String,
+			default: "media/default_zszxma",
+		},
+	},
+	coverImage: {
+		url: {
+			type: String,
+			default:
+				"https://res.cloudinary.com/twittr/image/upload/v1586895816/media/cover_i5waru.jpg",
+		},
+		id: {
+			type: String,
+			default: "media/cover_i5waru",
+		},
+	},
+	// resetToken: String,
+	// resetTokenExpiration: String,
 	bio: {
 		about: {
 			type: String,

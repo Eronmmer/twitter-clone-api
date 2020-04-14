@@ -78,7 +78,7 @@ exports.latestTweets = async (req, res, next) => {
 				let blockedMe = user.blockedMe;
 				let allRestricted = [...muted, ...blocked, ...blockedMe];
 				allRestricted.forEach((e, i) => (allRestricted[i] = e.toString()));
-				console.log(allRestricted);
+				// console.log(allRestricted);
 				finalData.forEach((e, i) => {
 					if (allRestricted.includes(e.user.toString())) {
 						finalData.splice(i, 1);

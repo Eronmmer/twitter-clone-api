@@ -1,16 +1,74 @@
 const express = require("express");
+const multer = require("multer");
+const cloudinary = require("cloudinary");
+const cloudinaryStorage = require("multer-storage-cloudinary");
 const router = express.Router();
 const { check } = require("express-validator");
 const authenticator = require("../middleware/authenticator");
 const {
 	allTweets,
 	allLikes,
-	getBio,
+	getUserProfile,
 	editBio,
-	getProfile,
+	getMyProfile,
 	changeName,
 	changeUsername,
+	changeAvatar,
+	changeCoverImage,
 } = require("../controllers/users");
+
+cloudinary.config({
+	cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+	api_key: process.env.CLOUDINARY_API_KEY,
+	api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+const avatarStorage = cloudinaryStorage({
+	cloudinary: cloudinary,
+	folder: "media",
+	allowedFormats: ["jpg", "png"],
+	transformation: [{ width: 400, height: 400, crop: "limit" }],
+});
+const coverStorage = cloudinaryStorage({
+	cloudinary: cloudinary,
+	folder: "media",
+	allowedFormats: ["jpg", "png"],
+	transformation: [{ width: 600, height: 200, crop: "limit" }],
+});
+
+const avatarParser = multer({
+	storage: avatarStorage,
+	fileFilter: (req, file, cb) => {
+		if (
+			!file.mimetype.includes("jpeg") &&
+			!file.mimetype.includes("jpg") &&
+			!file.mimetype.includes("png") &&
+			!file.mimetype.includes("pjp") &&
+			!file.mimetype.includes("pjpeg") &&
+			!file.mimetype.includes("jfif") &&
+			!file.mimetype.includes("webp")
+		) {
+			return cb(new Error("Only images are allowed"));
+		}
+		cb(undefined, true);
+	},
+});
+const coverParser = multer({
+	storage: coverStorage,
+	fileFilter: (req, file, cb) => {
+		if (
+			!file.mimetype.includes("jpeg") &&
+			!file.mimetype.includes("jpg") &&
+			!file.mimetype.includes("png") &&
+			!file.mimetype.includes("pjp") &&
+			!file.mimetype.includes("pjpeg") &&
+			!file.mimetype.includes("jfif") &&
+			!file.mimetype.includes("webp")
+		) {
+			return cb(new Error("Only images are allowed"));
+		}
+		cb(undefined, true);
+	},
+});
 
 /*
  * @desc Get all tweets of a user including retweets.
@@ -33,14 +91,14 @@ router.get("/likes/:userId", allLikes);
  * @method GET
  * @api public
  */
-router.get("/bio/:username", getBio);
+router.get("/profile/:username", getUserProfile);
 
 /*
  * @desc Get current user's profile
  * @method GET
  * @api private
  */
-router.get("/profile", authenticator, getProfile);
+router.get("/profile", authenticator, getMyProfile);
 
 /*
  * @desc Edit the current user bio
@@ -66,5 +124,55 @@ router.put(
  * @api private
  */
 router.put("/profile-change/username", authenticator, changeUsername);
+
+/*
+ * @desc Change avatar of current user
+ * @method POST
+ * @api private
+ */
+router.post(
+	"/profile-change/avatar",
+	[authenticator, avatarParser.single("profile-image")],
+	changeAvatar,
+	(err, req, res, next) => {
+		if (err.message === "Only images are allowed") {
+			return res.status(400).json({
+				errors: [
+					{
+						msg: err.message,
+						status: "400",
+					},
+				],
+			});
+		} else {
+			next(err);
+		}
+	}
+);
+
+/*
+ * @desc Change cover Image(banner) of current user
+ * @method POST
+ * @api private
+ */
+router.post(
+	"/profile-change/cover",
+	[authenticator, coverParser.single("cover-image")],
+	changeCoverImage,
+	(err, req, res, next) => {
+		if (err.message === "Only images are allowed") {
+			return res.status(400).json({
+				errors: [
+					{
+						msg: err.message,
+						status: "400",
+					},
+				],
+			});
+		} else {
+			next(err);
+		}
+	}
+);
 
 module.exports = router;

@@ -89,12 +89,34 @@ exports.allLikes = async (req, res, next) => {
 };
 
 // Get the bio of any user by their username
-exports.getBio = async (req, res, next) => {
+exports.getUserProfile = async (req, res, next) => {
 	try {
 		const findUser = await User.findOne({ username: req.params.username });
 		checkIfNotUser(findUser, res, "public");
-		const { id, name, user, username, followers, following, bio } = findUser;
-		res.json({ data: { id, name, user, username, bio, followers, following } });
+		const {
+			id,
+			name,
+			user,
+			avatar,
+			coverImage,
+			username,
+			followers,
+			following,
+			bio,
+		} = findUser;
+		res.json({
+			data: {
+				id,
+				name,
+				user,
+				avatar: avatar.url,
+				coverImage: coverImage.url,
+				username,
+				bio,
+				followers,
+				following,
+			},
+		});
 	} catch (err) {
 		objectIdError(res, err, "User not found");
 		next(err);
@@ -130,7 +152,7 @@ exports.editBio = async (req, res, next) => {
 };
 
 // Get the profile of current user
-exports.getProfile = async (req, res, next) => {
+exports.getMyProfile = async (req, res, next) => {
 	try {
 		const findUser = await User.findById(req.user.id);
 		checkIfNotUser(findUser, res);
@@ -148,6 +170,8 @@ exports.getProfile = async (req, res, next) => {
 			id,
 			name,
 			user,
+			avatar,
+			coverImage,
 			username,
 			followers,
 			following,
@@ -161,6 +185,8 @@ exports.getProfile = async (req, res, next) => {
 				id,
 				name,
 				user,
+				avatar: avatar.url,
+				coverImage: coverImage.url,
 				username,
 				bio,
 				followers,
@@ -242,6 +268,47 @@ exports.changeUsername = async (req, res, next) => {
 		res.json({
 			data: {
 				username: findUser.username,
+			},
+		});
+	} catch (err) {
+		next(err);
+	}
+};
+
+// Change avatar/profile-pic of current user
+exports.changeAvatar = async (req, res, next) => {
+	try {
+		const user = await User.findById(req.user.id);
+		checkIfNotUser(user, res);
+		console.log(req.file);
+		const url = req.file.url;
+		const id = req.file.public_id;
+		user.avatar.url = url;
+		user.avatar.id = id;
+		await user.save();
+		res.json({
+			data: {
+				url,
+			},
+		});
+	} catch (err) {
+		next(err);
+	}
+};
+
+// Change cover image of current user
+exports.changeCoverImage = async (req, res, next) => {
+	try {
+		const user = await User.findById(req.user.id);
+		checkIfNotUser(user, res);
+		const url = req.file.url;
+		const id = req.file.public_id;
+		user.avatar.url = url;
+		user.avatar.id = id;
+		await user.save();
+		res.json({
+			data: {
+				url,
 			},
 		});
 	} catch (err) {

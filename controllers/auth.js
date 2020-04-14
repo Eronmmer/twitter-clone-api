@@ -110,8 +110,9 @@ exports.login = async (req, res, next) => {
 			res.json({
 				data: {
 					user: {
-						email,
+						email: user.email,
 						username: user.username,
+						id: user.id,
 					},
 					token,
 				},
@@ -126,7 +127,17 @@ exports.login = async (req, res, next) => {
 exports.getUser = async (req, res, next) => {
 	try {
 		const user = await User.findById(req.user.id).select(["-password"]);
-		const { name, email, username, id } = user;
+		const {
+			name,
+			email,
+			username,
+			id,
+			avatar,
+			coverImage,
+			followers,
+			following,
+			bio,
+		} = user;
 		res.json({
 			data: {
 				user: {
@@ -134,6 +145,11 @@ exports.getUser = async (req, res, next) => {
 					email,
 					username,
 					id,
+					avatar: avatar.url,
+					coverImage: coverImage.url,
+					followers,
+					following,
+					bio,
 				},
 			},
 		});
