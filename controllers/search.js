@@ -20,7 +20,7 @@ exports.search = async (req, res, next) => {
 				],
 			}).select(["-password", "-blocked", "-blockedMe", "-muted"]);
 			// if authenticated, check if user blocked requester
-			if (checkIfAuthenticated(req)) {
+			if (checkIfAuthenticated(req) === true) {
 				const authenticatedUser = await User.findById(req.user.id);
 				checkIfNotUser(authenticatedUser, res);
 				const usersCopy = [...users];
@@ -46,7 +46,7 @@ exports.search = async (req, res, next) => {
 			}
 
 			// if authenticated, check if user blocked requester
-			if (checkIfAuthenticated(req)) {
+			if (checkIfAuthenticated(req) === true) {
 				const authenticatedUser = await User.findById(req.user.id);
 				checkIfNotUser(authenticatedUser, res);
 				// If blocked, return empty data
@@ -89,7 +89,7 @@ exports.search = async (req, res, next) => {
 			const all = [...tweets, ...comments].sort((a, b) => b.date - a.date);
 
 			// if authenticated, check if owner of tweet or comment blocked requester
-			if (checkIfAuthenticated(req)) {
+			if (checkIfAuthenticated(req) === true) {
 				const authenticatedUser = await User.findById(req.user.id);
 				checkIfNotUser(authenticatedUser, res);
 				// check this gymnastics here during testing---------

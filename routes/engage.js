@@ -13,14 +13,6 @@ const {
 } = require("../controllers/engage");
 
 /*
-there will be 
-- follow users, unfollow
-- block user(. once you block, once you block you unfollow but not the otherway round), unblock
-- mute user, unmute
-- turn on post notifications(you must be following and not blocked), turn off
- */
-
-/*
  * @desc Follow a User
  * @method PUT
  * @api private

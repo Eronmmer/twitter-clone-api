@@ -18,7 +18,7 @@ exports.allTweets = async (req, res, next) => {
 		const findUser = await User.findById(user);
 		checkIfNotUser(findUser, res, "public");
 		// if authenticated, check if user blocked requester
-		if (checkIfAuthenticated(req)) {
+		if (checkIfAuthenticated(req) === true) {
 			const authenticatedUser = await User.findById(req.user.id);
 			checkIfNotUser(authenticatedUser, res);
 			checkIfBlocked(res, authenticatedUser, findUser);
@@ -64,7 +64,7 @@ exports.allLikes = async (req, res, next) => {
 		const findUser = await User.findById(user);
 		checkIfNotUser(findUser, res, "public");
 		// if authenticated, check if user blocked requester
-		if (checkIfAuthenticated(req)) {
+		if (checkIfAuthenticated(req) === true) {
 			const authenticatedUser = await User.findById(req.user.id);
 			checkIfNotUser(authenticatedUser, res);
 			checkIfBlocked(res, authenticatedUser, findUser);
@@ -93,6 +93,42 @@ exports.allLikes = async (req, res, next) => {
 exports.getUserProfile = async (req, res, next) => {
 	try {
 		const findUser = await User.findOne({ username: req.params.username });
+		checkIfNotUser(findUser, res, "public");
+		const {
+			id,
+			name,
+			user,
+			avatar,
+			coverImage,
+			username,
+			followers,
+			following,
+			bio,
+		} = findUser;
+		res.json({
+			data: {
+				id,
+				name,
+				user,
+				avatar: avatar.url,
+				coverImage: coverImage.url,
+				username,
+				bio,
+				followers,
+				following,
+			},
+		});
+	} catch (err) {
+		objectIdError(res, err, "User not found");
+		next(err);
+	}
+};
+
+
+// Get the bio of any user by their id
+exports.getUserById = async (req, res, next) => {
+	try {
+		const findUser = await User.findById(req.params.userId);
 		checkIfNotUser(findUser, res, "public");
 		const {
 			id,
@@ -383,10 +419,7 @@ exports.changePassword = async (req, res, next) => {
 	}
 	try {
 		const user = await User.findById(req.user.id);
-		console.log(req.user.id);
 		checkIfNotUser(user, res);
-
-		console.log(user);
 		const isMatch = await bcrypt.compare(oldPassword, user.password);
 		if (!isMatch) {
 			return res.status(400).json({

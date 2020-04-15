@@ -4,7 +4,7 @@ const Comment = require("../models/Comment");
 const { checkIfNotUser } = require("../utils");
 
 // get the latest tweets to display on the TL
-// first get latest tweets, comments and retweets of current user latest replies to their tweets, tweets, retweets, likes, comments of followings,
+// latest tweets, comments and retweets of current user latest replies to their tweets, tweets, retweets, likes, comments of followings,
 exports.latestTweets = async (req, res, next) => {
 	try {
 		const user = await User.findById(req.user.id);
@@ -51,7 +51,6 @@ exports.latestTweets = async (req, res, next) => {
 					},
 				],
 			}).sort({ date: -1 });
-			// console.log(posts);
 			followersTweets.unshift(...posts);
 			let comments = await Comment.find({
 				$and: [
@@ -78,7 +77,6 @@ exports.latestTweets = async (req, res, next) => {
 				let blockedMe = user.blockedMe;
 				let allRestricted = [...muted, ...blocked, ...blockedMe];
 				allRestricted.forEach((e, i) => (allRestricted[i] = e.toString()));
-				// console.log(allRestricted);
 				finalData.forEach((e, i) => {
 					if (allRestricted.includes(e.user.toString())) {
 						finalData.splice(i, 1);

@@ -6,7 +6,6 @@ const {
 	checkIfNotUser,
 	objectIdError,
 	checkIfAuthenticated,
-	checkIfBlocked,
 } = require("../utils");
 
 exports.getTweet = async (req, res, next) => {
@@ -29,9 +28,18 @@ exports.getTweet = async (req, res, next) => {
 		if (checkIfAuthenticated(req)) {
 			const findUserId = tweet.user;
 			const findUser = await User.findById(findUserId);
-			const authenticatedUser = await User.findById(req.user.id);
+			const authenticatedUser = await User.findById(checkIfAuthenticated(req));
 			checkIfNotUser(authenticatedUser, res);
-			checkIfBlocked(res, authenticatedUser, findUser);
+			if (findUser.blocked.includes(authenticatedUser.id)) {
+				return res.status(403).json({
+					errors: [
+						{
+							msg: "You're blocked from viewing this user's tweets",
+							status: "403",
+						},
+					],
+				});
+			}
 		}
 
 		const {
@@ -142,7 +150,16 @@ exports.quoteTweet = async (req, res, next) => {
 		// Check if user blocked requester
 		const tweetOwnerId = tweetToQuote.user;
 		const tweetOwner = await User.findById(tweetOwnerId);
-		checkIfBlocked(res, user, tweetOwner);
+		if (tweetOwner.blocked.includes(user.id)) {
+			return res.status(403).json({
+				errors: [
+					{
+						msg: "You're blocked from viewing this user's tweets",
+						status: "403",
+					},
+				],
+			});
+		}
 
 		const { postContent } = req.body;
 		const tweet = new Post({
@@ -222,7 +239,16 @@ exports.likeTweet = async (req, res, next) => {
 		// Check if user blocked requester
 		const tweetOwnerId = tweet.user;
 		const tweetOwner = await User.findById(tweetOwnerId);
-		checkIfBlocked(res, findUser, tweetOwner);
+		if (tweetOwner.blocked.includes(req.user.id)) {
+			return res.status(403).json({
+				errors: [
+					{
+						msg: "You're blocked from viewing this user's tweets",
+						status: "403",
+					},
+				],
+			});
+		}
 
 		// check if tweet has already been liked by this user
 		if (tweet.likes.filter((like) => like.toString() === user).length > 0) {
@@ -263,10 +289,6 @@ exports.unlikeTweet = async (req, res, next) => {
 				],
 			});
 		}
-		// Check if tweet owner blocked requester
-		const tweetOwnerId = tweet.user;
-		const tweetOwner = await User.findById(tweetOwnerId);
-		checkIfBlocked(res, findUser, tweetOwner);
 
 		// check is user hasn't liked already
 		if (tweet.likes.filter((like) => like.toString() === user).length === 0) {
@@ -315,7 +337,16 @@ exports.commentOnTweet = async (req, res, next) => {
 		// check if tweet owner blocked requester
 		const tweetOwnerId = tweet.user;
 		const tweetOwner = await User.findById(tweetOwnerId);
-		checkIfBlocked(res, findUser, tweetOwner);
+		if (tweetOwner.blocked.includes(req.user.id)) {
+			return res.status(403).json({
+				errors: [
+					{
+						msg: "You're blocked from viewing this user's tweets",
+						status: "403",
+					},
+				],
+			});
+		}
 
 		const { postContent } = req.body;
 		const comment = new Comment({
@@ -362,8 +393,17 @@ exports.retweet = async (req, res, next) => {
 		// check if tweet owner blocked requester
 		const tweetOwnerId = tweet.user;
 		const tweetOwner = await User.findById(tweetOwnerId);
-		checkIfBlocked(res, findUser, tweetOwner);
-		
+		if (tweetOwner.blocked.includes(req.user.id)) {
+			return res.status(403).json({
+				errors: [
+					{
+						msg: "You're blocked from viewing this user's tweets",
+						status: "403",
+					},
+				],
+			});
+		}
+
 		// check if tweet has already been retweeted by this user
 		if (
 			tweet.retweets.filter((retweet) => retweet.toString() === user).length > 0

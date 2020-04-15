@@ -101,7 +101,7 @@ router.put("/retweet/:tweetId", authenticator, retweet);
  * @method PUT
  * @api private
  */
-router.put("/unretweet/:tweetId", authenticator, undoRetweet);
+router.put("/undo-retweet/:tweetId", authenticator, undoRetweet);
 
 /*
  * @desc Delete a Tweet

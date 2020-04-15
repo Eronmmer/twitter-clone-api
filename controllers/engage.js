@@ -438,7 +438,7 @@ exports.notificationsOn = async (req, res, next) => {
 			res.json({
 				data: {
 					notificationsOnFor: user.following.filter(
-						(e) => e.user.notificationsOn === true
+						(e) => e.notificationsOn === true
 					),
 				},
 			});

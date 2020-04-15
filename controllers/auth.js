@@ -2,7 +2,6 @@ const jwt = require("jsonwebtoken");
 const shortid = require("shortid");
 const secret = process.env.JWT_SECRET;
 const bcrypt = require("bcryptjs");
-const crypto = require("crypto");
 const { validationResult } = require("express-validator");
 const User = require("../models/User");
 const {
@@ -184,7 +183,6 @@ exports.forgotPassword = async (req, res, next) => {
 			});
 		}
 		const token = shortid.generate();
-		console.log(token);
 		user.resetToken = token;
 		user.resetTokenExpirationDate = Date.now() + 3600000;
 		await user.save();
@@ -199,7 +197,7 @@ exports.forgotPassword = async (req, res, next) => {
 	}
 };
 
-// handle reset link
+// handle reset password
 exports.resetPassword = async (req, res, next) => {
 	const { password, token } = req.body;
 	const errors = validationResult(req);
@@ -207,7 +205,6 @@ exports.resetPassword = async (req, res, next) => {
 		return res.status(422).json({ errors: errors.array() });
 	}
 	try {
-		// const token = req.params.token;
 		const user = await User.findOne(
 			{ resetTokenExpirationDate: { $gt: Date.now() } },
 			{ resetToken: token },

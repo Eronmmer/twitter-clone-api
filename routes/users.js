@@ -19,6 +19,7 @@ const {
 	removeCoverImage,
 	deleteAccount,
 	changePassword,
+	getUserById,
 } = require("../controllers/users");
 
 cloudinary.config({
@@ -96,6 +97,14 @@ router.get("/likes/:userId", allLikes);
  * @api public
  */
 router.get("/profile/:username", getUserProfile);
+
+
+/*
+ * @desc Get bio/profile of any user by id
+ * @method GET
+ * @api public
+ */
+router.get("/profile-by-id/:userId", getUserById);
 
 /*
  * @desc Get current user's profile
