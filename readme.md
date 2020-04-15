@@ -1,5 +1,7 @@
 # Twitter clone API
 
+> This project is a work in progress. 
+
 This is a project I built while learning Node.js/Express and MongoDB. A REST API with most of Twitter's main features.
 
 
@@ -8,6 +10,8 @@ This is a project I built while learning Node.js/Express and MongoDB. A REST API
 - Authentication/Authorization
 - Users can create, edit, like, retweet and quote tweets.
 - Users can follow, unfollow, mute, block, unblock, turn on and off notifications of users.
+- Users can change, remove profile and cover photo
+- Users get updated tweets on their TL based on who they follow and those whose tweets their followings interact with
 - Others coming ⚡
 
 ## Usage
