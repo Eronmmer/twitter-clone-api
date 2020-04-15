@@ -8,6 +8,6 @@ const authenticator = require("../middleware/authenticator");
  * @method GET
  * @api Private
 */
-router.get("/:latest", authenticator, latestTweets);
+router.get("/latest", authenticator, latestTweets);
 
 module.exports = router;

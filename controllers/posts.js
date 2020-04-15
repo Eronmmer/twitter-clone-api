@@ -233,7 +233,14 @@ exports.likeTweet = async (req, res, next) => {
 			(await Post.findById(req.params.tweetId)) ||
 			(await Comment.findById(req.params.tweetId));
 		if (!tweet) {
-			return res.status(404).send("This tweet is not available");
+			return res.status(404).json({
+				errors: [
+					{
+						msg: "This tweet is not available",
+						status: "404",
+					},
+				],
+			});
 		}
 
 		// Check if user blocked requester

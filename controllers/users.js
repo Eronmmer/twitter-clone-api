@@ -7,7 +7,6 @@ const {
 	checkIfNotUser,
 	objectIdError,
 	checkIfAuthenticated,
-	checkIfBlocked,
 	reservedUsernames,
 } = require("../utils");
 
@@ -18,10 +17,19 @@ exports.allTweets = async (req, res, next) => {
 		const findUser = await User.findById(user);
 		checkIfNotUser(findUser, res, "public");
 		// if authenticated, check if user blocked requester
-		if (checkIfAuthenticated(req) === true) {
-			const authenticatedUser = await User.findById(req.user.id);
+		if (checkIfAuthenticated(req)) {
+			const authenticatedUser = await User.findById(checkIfAuthenticated(req));
 			checkIfNotUser(authenticatedUser, res);
-			checkIfBlocked(res, authenticatedUser, findUser);
+			if (findUser.blocked.includes(checkIfAuthenticated(req))) {
+				return res.status(403).json({
+					errors: [
+						{
+							msg: "You're blocked from viewing this user's tweets",
+							status: "403",
+						},
+					],
+				});
+			}
 		}
 		const userTweets = await Post.find({
 			user,
@@ -64,10 +72,19 @@ exports.allLikes = async (req, res, next) => {
 		const findUser = await User.findById(user);
 		checkIfNotUser(findUser, res, "public");
 		// if authenticated, check if user blocked requester
-		if (checkIfAuthenticated(req) === true) {
-			const authenticatedUser = await User.findById(req.user.id);
+		if (checkIfAuthenticated(req)) {
+			const authenticatedUser = await User.findById(checkIfAuthenticated(req));
 			checkIfNotUser(authenticatedUser, res);
-			checkIfBlocked(res, authenticatedUser, findUser);
+			if (findUser.blocked.includes(checkIfAuthenticated(req))) {
+				return res.status(403).json({
+					errors: [
+						{
+							msg: "You're blocked from viewing this user's tweets",
+							status: "403",
+						},
+					],
+				});
+			}
 		}
 		const postLikes = await Post.find({
 			likes: user,
@@ -93,7 +110,17 @@ exports.allLikes = async (req, res, next) => {
 exports.getUserProfile = async (req, res, next) => {
 	try {
 		const findUser = await User.findOne({ username: req.params.username });
-		checkIfNotUser(findUser, res, "public");
+		// checkIfNotUser(findUser, res, "public");
+		if (!findUser) {
+			return res.status(404).json({
+				errors: [
+					{
+						msg: "User not found",
+						status: "404",
+					},
+				],
+			});
+		}
 		const {
 			id,
 			name,

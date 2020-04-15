@@ -45,5 +45,4 @@ npm run test
 
 ## API Documentation
 
-> coming soon ⚡
-<!-- add endpoints here -->
+https://documenter.getpostman.com/view/8476412/Szf3ZV8L?version=latest#992a198a-5fc0-4fc8-ab44-ddff2ab0bba8

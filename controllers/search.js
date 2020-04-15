@@ -20,12 +20,12 @@ exports.search = async (req, res, next) => {
 				],
 			}).select(["-password", "-blocked", "-blockedMe", "-muted"]);
 			// if authenticated, check if user blocked requester
-			if (checkIfAuthenticated(req) === true) {
-				const authenticatedUser = await User.findById(req.user.id);
+			if (checkIfAuthenticated(req)) {
+				const authenticatedUser = await User.findById(checkIfAuthenticated(req));
 				checkIfNotUser(authenticatedUser, res);
 				const usersCopy = [...users];
 				usersCopy.forEach((e, i) => {
-					if (e.blocked.includes(req.user.id)) {
+					if (e.blocked.includes(authenticatedUser.id)) {
 						usersCopy.splice(i, 1);
 					}
 				});
@@ -46,8 +46,8 @@ exports.search = async (req, res, next) => {
 			}
 
 			// if authenticated, check if user blocked requester
-			if (checkIfAuthenticated(req) === true) {
-				const authenticatedUser = await User.findById(req.user.id);
+			if (checkIfAuthenticated(req)) {
+				const authenticatedUser = await User.findById(checkIfAuthenticated(req));
 				checkIfNotUser(authenticatedUser, res);
 				// If blocked, return empty data
 				if (user.blocked.includes(authenticatedUser.id)) {
@@ -89,14 +89,13 @@ exports.search = async (req, res, next) => {
 			const all = [...tweets, ...comments].sort((a, b) => b.date - a.date);
 
 			// if authenticated, check if owner of tweet or comment blocked requester
-			if (checkIfAuthenticated(req) === true) {
-				const authenticatedUser = await User.findById(req.user.id);
+			if (checkIfAuthenticated(req)) {
+				const authenticatedUser = await User.findById(checkIfAuthenticated(req));
 				checkIfNotUser(authenticatedUser, res);
-				// check this gymnastics here during testing---------
 				try {
 					all.forEach(async (e, i) => {
 						const user = await User.findById(e.user);
-						if (user.blocked.includes(req.user.id)) {
+						if (user.blocked.includes(authenticatedUser.id)) {
 							all.splice(i, 1);
 						}
 					});
