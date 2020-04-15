@@ -1,10 +1,7 @@
 const User = require("../models/User");
 const Post = require("../models/Post");
 const Comment = require("../models/Comment");
-const {
-	checkIfAuthenticated,
-	checkIfNotUser,
-} = require("../utils");
+const { checkIfAuthenticated } = require("../utils");
 
 // search for tweets
 // search queries =>from=account to search tweet from type=type of search to make, tweet or user(tweet by default)
@@ -21,8 +18,10 @@ exports.search = async (req, res, next) => {
 			}).select(["-password", "-blocked", "-blockedMe", "-muted"]);
 			// if authenticated, check if user blocked requester
 			if (checkIfAuthenticated(req)) {
-				const authenticatedUser = await User.findById(checkIfAuthenticated(req));
-				checkIfNotUser(authenticatedUser, res);
+				const authenticatedUser = await User.findById(
+					checkIfAuthenticated(req)
+				);
+
 				const usersCopy = [...users];
 				usersCopy.forEach((e, i) => {
 					if (e.blocked.includes(authenticatedUser.id)) {
@@ -47,8 +46,10 @@ exports.search = async (req, res, next) => {
 
 			// if authenticated, check if user blocked requester
 			if (checkIfAuthenticated(req)) {
-				const authenticatedUser = await User.findById(checkIfAuthenticated(req));
-				checkIfNotUser(authenticatedUser, res);
+				const authenticatedUser = await User.findById(
+					checkIfAuthenticated(req)
+				);
+
 				// If blocked, return empty data
 				if (user.blocked.includes(authenticatedUser.id)) {
 					return res.json({
@@ -90,8 +91,10 @@ exports.search = async (req, res, next) => {
 
 			// if authenticated, check if owner of tweet or comment blocked requester
 			if (checkIfAuthenticated(req)) {
-				const authenticatedUser = await User.findById(checkIfAuthenticated(req));
-				checkIfNotUser(authenticatedUser, res);
+				const authenticatedUser = await User.findById(
+					checkIfAuthenticated(req)
+				);
+
 				try {
 					all.forEach(async (e, i) => {
 						const user = await User.findById(e.user);

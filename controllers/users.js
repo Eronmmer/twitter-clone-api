@@ -4,7 +4,6 @@ const Post = require("../models/Post");
 const Comment = require("../models/Comment");
 const { validationResult } = require("express-validator");
 const {
-	checkIfNotUser,
 	objectIdError,
 	checkIfAuthenticated,
 	reservedUsernames,
@@ -15,11 +14,9 @@ exports.allTweets = async (req, res, next) => {
 	try {
 		const user = req.params.userId;
 		const findUser = await User.findById(user);
-		checkIfNotUser(findUser, res, "public");
+
 		// if authenticated, check if user blocked requester
 		if (checkIfAuthenticated(req)) {
-			const authenticatedUser = await User.findById(checkIfAuthenticated(req));
-			checkIfNotUser(authenticatedUser, res);
 			if (findUser.blocked.includes(checkIfAuthenticated(req))) {
 				return res.status(403).json({
 					errors: [
@@ -70,11 +67,9 @@ exports.allLikes = async (req, res, next) => {
 	try {
 		const user = req.params.userId;
 		const findUser = await User.findById(user);
-		checkIfNotUser(findUser, res, "public");
+
 		// if authenticated, check if user blocked requester
 		if (checkIfAuthenticated(req)) {
-			const authenticatedUser = await User.findById(checkIfAuthenticated(req));
-			checkIfNotUser(authenticatedUser, res);
 			if (findUser.blocked.includes(checkIfAuthenticated(req))) {
 				return res.status(403).json({
 					errors: [
@@ -110,7 +105,7 @@ exports.allLikes = async (req, res, next) => {
 exports.getUserProfile = async (req, res, next) => {
 	try {
 		const findUser = await User.findOne({ username: req.params.username });
-		// checkIfNotUser(findUser, res, "public");
+
 		if (!findUser) {
 			return res.status(404).json({
 				errors: [
@@ -151,12 +146,11 @@ exports.getUserProfile = async (req, res, next) => {
 	}
 };
 
-
 // Get the bio of any user by their id
 exports.getUserById = async (req, res, next) => {
 	try {
 		const findUser = await User.findById(req.params.userId);
-		checkIfNotUser(findUser, res, "public");
+
 		const {
 			id,
 			name,
@@ -192,7 +186,7 @@ exports.editBio = async (req, res, next) => {
 	const { about, dateOfBirth, website } = req.body;
 	try {
 		const user = await User.findById(req.user.id);
-		checkIfNotUser(user, res);
+
 		if (about) {
 			user.bio.about = about;
 			await user.save();
@@ -219,7 +213,7 @@ exports.editBio = async (req, res, next) => {
 exports.getMyProfile = async (req, res, next) => {
 	try {
 		const findUser = await User.findById(req.user.id);
-		checkIfNotUser(findUser, res);
+
 		if (findUser.id.toString() !== req.user.id) {
 			return res.status(403).json({
 				errors: [
@@ -274,7 +268,7 @@ exports.changeName = async (req, res, next) => {
 	}
 	try {
 		const findUser = await User.findById(req.user.id);
-		checkIfNotUser(findUser, res);
+
 		if (findUser.id.toString() !== req.user.id) {
 			return res.status(403).json({
 				errors: [
@@ -306,7 +300,7 @@ exports.changeUsername = async (req, res, next) => {
 	}
 	try {
 		const findUser = await User.findById(req.user.id);
-		checkIfNotUser(findUser, res);
+
 		if (findUser.id.toString() !== req.user.id) {
 			return res.status(403).json({
 				errors: [
@@ -343,7 +337,7 @@ exports.changeUsername = async (req, res, next) => {
 exports.changeAvatar = async (req, res, next) => {
 	try {
 		const user = await User.findById(req.user.id);
-		checkIfNotUser(user, res);
+
 		const url = req.file.url;
 		const id = req.file.public_id;
 		user.avatar.url = url;
@@ -363,7 +357,7 @@ exports.changeAvatar = async (req, res, next) => {
 exports.changeCoverImage = async (req, res, next) => {
 	try {
 		const user = await User.findById(req.user.id);
-		checkIfNotUser(user, res);
+
 		const url = req.file.url;
 		const id = req.file.public_id;
 		user.coverImage.url = url;
@@ -383,7 +377,7 @@ exports.changeCoverImage = async (req, res, next) => {
 exports.removeAvatar = async (req, res, next) => {
 	try {
 		const user = await User.findById(req.user.id);
-		checkIfNotUser(user, res);
+
 		user.avatar.url = process.env.DEFAULT_AVATAR_URL;
 		user.avatar.id = process.env.DEFAULT_AVATAR_ID;
 
@@ -403,7 +397,7 @@ exports.removeAvatar = async (req, res, next) => {
 exports.removeCoverImage = async (req, res, next) => {
 	try {
 		const user = await User.findById(req.user.id);
-		checkIfNotUser(user, res);
+
 		user.coverImage.url = process.env.DEFAULT_COVER_URL;
 		user.coverImage.id = process.env.DEFAULT_COVER_ID;
 
@@ -423,7 +417,7 @@ exports.removeCoverImage = async (req, res, next) => {
 exports.deleteAccount = async (req, res, next) => {
 	try {
 		const user = await User.findById(req.user.id);
-		checkIfNotUser(user, res);
+
 		await user.remove();
 		await Post.deleteMany({ user: req.user.id });
 		await Comment.deleteMany({ user: req.user.id });
@@ -446,7 +440,7 @@ exports.changePassword = async (req, res, next) => {
 	}
 	try {
 		const user = await User.findById(req.user.id);
-		checkIfNotUser(user, res);
+
 		const isMatch = await bcrypt.compare(oldPassword, user.password);
 		if (!isMatch) {
 			return res.status(400).json({

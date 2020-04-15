@@ -2,11 +2,7 @@ const Post = require("../models/Post");
 const User = require("../models/User");
 const Comment = require("../models/Comment");
 const { validationResult } = require("express-validator");
-const {
-	checkIfNotUser,
-	objectIdError,
-	checkIfAuthenticated,
-} = require("../utils");
+const { objectIdError, checkIfAuthenticated } = require("../utils");
 
 exports.getTweet = async (req, res, next) => {
 	try {
@@ -29,7 +25,7 @@ exports.getTweet = async (req, res, next) => {
 			const findUserId = tweet.user;
 			const findUser = await User.findById(findUserId);
 			const authenticatedUser = await User.findById(checkIfAuthenticated(req));
-			checkIfNotUser(authenticatedUser, res);
+
 			if (findUser.blocked.includes(authenticatedUser.id)) {
 				return res.status(403).json({
 					errors: [
@@ -107,7 +103,7 @@ exports.createTweet = async (req, res, next) => {
 	}
 	try {
 		const user = await User.findById(req.user.id);
-		checkIfNotUser(user, res);
+
 		const { postContent } = req.body;
 		const newPost = new Post({
 			postContent,
@@ -132,7 +128,7 @@ exports.quoteTweet = async (req, res, next) => {
 	}
 	try {
 		const user = await User.findById(req.user.id);
-		checkIfNotUser(user, res);
+
 		const tweetToQuote =
 			(await Post.findById(req.params.tweetId)) ||
 			(await Comment.findById(req.params.tweetId));
@@ -187,8 +183,6 @@ exports.editTweet = async (req, res, next) => {
 		return res.status(400).json({ errors: errors.array() });
 	}
 	try {
-		const user = await User.findById(req.user.id);
-		checkIfNotUser(user, res);
 		const tweet =
 			(await Post.findById(req.params.tweetId)) ||
 			(await Comment.findById(req.params.tweetId));
@@ -227,8 +221,7 @@ exports.editTweet = async (req, res, next) => {
 exports.likeTweet = async (req, res, next) => {
 	try {
 		const user = req.user.id;
-		const findUser = await User.findById(user);
-		checkIfNotUser(findUser, res);
+
 		const tweet =
 			(await Post.findById(req.params.tweetId)) ||
 			(await Comment.findById(req.params.tweetId));
@@ -280,8 +273,7 @@ exports.likeTweet = async (req, res, next) => {
 exports.unlikeTweet = async (req, res, next) => {
 	try {
 		const user = req.user.id;
-		const findUser = await User.findById(user);
-		checkIfNotUser(findUser, res);
+
 		const tweet =
 			(await Post.findById(req.params.tweetId)) ||
 			(await Comment.findById(req.params.tweetId));
@@ -325,8 +317,7 @@ exports.commentOnTweet = async (req, res, next) => {
 	}
 	try {
 		const user = req.user.id;
-		const findUser = await User.findById(user);
-		checkIfNotUser(findUser, res);
+
 		const tweet =
 			(await Post.findById(req.params.tweetId)) ||
 			(await Comment.findById(req.params.tweetId));
@@ -382,8 +373,7 @@ exports.commentOnTweet = async (req, res, next) => {
 exports.retweet = async (req, res, next) => {
 	try {
 		const user = req.user.id;
-		const findUser = await User.findById(user);
-		checkIfNotUser(findUser, res);
+
 		const tweet =
 			(await Post.findById(req.params.tweetId)) ||
 			(await Comment.findById(req.params.tweetId));
@@ -436,8 +426,7 @@ exports.retweet = async (req, res, next) => {
 exports.undoRetweet = async (req, res, next) => {
 	try {
 		const user = req.user.id;
-		const findUser = await User.findById(user);
-		checkIfNotUser(findUser, res);
+
 		const tweet =
 			(await Post.findById(req.params.tweetId)) ||
 			(await Comment.findById(req.params.tweetId));
@@ -473,9 +462,6 @@ exports.undoRetweet = async (req, res, next) => {
 
 exports.deleteTweet = async (req, res, next) => {
 	try {
-		const user = req.user.id;
-		const findUser = await User.findById(user);
-		checkIfNotUser(findUser, res);
 		const tweet =
 			(await Post.findById(req.params.tweetId)) ||
 			(await Comment.findById(req.params.tweetId));

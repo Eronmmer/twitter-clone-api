@@ -1,14 +1,12 @@
 const User = require("../models/User");
 const Post = require("../models/Post");
 const Comment = require("../models/Comment");
-const { checkIfNotUser } = require("../utils");
 
 // get the latest tweets to display on the TL
 // latest tweets, comments and retweets of current user latest replies to their tweets, tweets, retweets, likes, comments of followings,
 exports.latestTweets = async (req, res, next) => {
 	try {
 		const user = await User.findById(req.user.id);
-		checkIfNotUser(user, res);
 
 		const ownTweets = await Post.find({
 			$and: [

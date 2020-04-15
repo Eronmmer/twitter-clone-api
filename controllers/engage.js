@@ -1,12 +1,10 @@
 const User = require("../models/User");
-const {checkIfNotUser} = require("../utils");
 
 // Follow a user
 exports.follow = async (req, res, next) => {
 	try {
 		const userToFollow = await User.findById(req.params.userId);
 		const user = await User.findById(req.user.id);
-		checkIfNotUser(user, res);
 		if (!userToFollow) {
 			return res.status(404).json({
 				errors: [
@@ -73,7 +71,6 @@ exports.unfollow = async (req, res, next) => {
 	try {
 		const userToUnfollow = await User.findById(req.params.userId);
 		const user = await User.findById(req.user.id);
-		checkIfNotUser(user, res);
 		if (!userToUnfollow) {
 			return res.status(404).json({
 				errors: [
@@ -148,7 +145,6 @@ exports.block = async (req, res, next) => {
 	try {
 		const userToBlock = await User.findById(req.params.userId);
 		const user = await User.findById(req.user.id);
-		checkIfNotUser(user, res);
 		if (!userToBlock) {
 			return res.status(404).json({
 				errors: [
@@ -289,7 +285,7 @@ exports.mute = async (req, res, next) => {
 	try {
 		const userToMute = await User.findById(req.params.userId);
 		const user = await User.findById(req.user.id);
-		checkIfNotUser(user, res);
+
 		if (!userToMute) {
 			return res.status(404).json({
 				errors: [
@@ -345,7 +341,7 @@ exports.unmute = async (req, res, next) => {
 	try {
 		const userToUnmute = await User.findById(req.params.userId);
 		const user = await User.findById(req.user.id);
-		checkIfNotUser(user, res);
+
 		if (!userToUnmute) {
 			return res.status(404).json({
 				errors: [{ msg: "User not found", status: "404" }],
@@ -395,7 +391,6 @@ exports.notificationsOn = async (req, res, next) => {
 		const following = await User.findById(req.params.userId);
 		const user = await User.findById(req.user.id);
 
-		checkIfNotUser(user, res);
 		if (!following) {
 			return res.status(404).json({
 				errors: [
@@ -425,7 +420,12 @@ exports.notificationsOn = async (req, res, next) => {
 				.length === 0
 		) {
 			return res.status(400).json({
-				errors: [{ msg: "Must follow user before turning on notifications", status: "400" }],
+				errors: [
+					{
+						msg: "Must follow user before turning on notifications",
+						status: "400",
+					},
+				],
 			});
 		} else {
 			user.following.forEach((e) => {
@@ -464,7 +464,6 @@ exports.notificationsOff = async (req, res, next) => {
 		const following = await User.findById(req.params.userId);
 		const user = await User.findById(req.user.id);
 
-		checkIfNotUser(user, res);
 		if (!following) {
 			return res.status(404).json({
 				errors: [
@@ -493,7 +492,12 @@ exports.notificationsOff = async (req, res, next) => {
 				.length === 0
 		) {
 			return res.status(400).json({
-				errors: [{ msg: "Must be following user before turning off notifications", status: "400" }],
+				errors: [
+					{
+						msg: "Must be following user before turning off notifications",
+						status: "400",
+					},
+				],
 			});
 		}
 

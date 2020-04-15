@@ -7,7 +7,6 @@ const User = require("../models/User");
 const {
 	reservedUsernames,
 	welcomeEmail,
-	checkIfNotUser,
 	sendResetEmail,
 } = require("../utils");
 
@@ -134,7 +133,6 @@ exports.login = async (req, res, next) => {
 exports.getUser = async (req, res, next) => {
 	try {
 		const user = await User.findById(req.user.id).select(["-password"]);
-		checkIfNotUser(user, res);
 		const {
 			name,
 			email,
