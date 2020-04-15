@@ -17,6 +17,7 @@ const {
 	changeCoverImage,
 	removeAvatar,
 	removeCoverImage,
+	deleteAccount
 } = require("../controllers/users");
 
 cloudinary.config({
@@ -190,5 +191,12 @@ router.delete("/profile-change/avatar", authenticator, removeAvatar);
  * @api private
  */
 router.delete("/profile-change/cover", authenticator, removeCoverImage);
+
+/*
+ * @desc Delete account of current user
+ * @method DELETE
+ * @api private
+ */
+router.delete("/account/me", authenticator, deleteAccount);
 
 module.exports = router;

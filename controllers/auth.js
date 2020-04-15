@@ -1,9 +1,16 @@
 const jwt = require("jsonwebtoken");
+const shortid = require("shortid");
 const secret = process.env.JWT_SECRET;
 const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
 const { validationResult } = require("express-validator");
 const User = require("../models/User");
-const { reservedUsernames } = require("../utils");
+const {
+	reservedUsernames,
+	welcomeEmail,
+	checkIfNotUser,
+	sendResetEmail,
+} = require("../utils");
 
 // Register a user
 exports.register = async (req, res, next) => {
@@ -59,6 +66,7 @@ exports.register = async (req, res, next) => {
 		});
 
 		await user.save();
+		welcomeEmail(email, name);
 		res.status(200).json({
 			data: {
 				msg: "Account successfully created",
@@ -127,6 +135,7 @@ exports.login = async (req, res, next) => {
 exports.getUser = async (req, res, next) => {
 	try {
 		const user = await User.findById(req.user.id).select(["-password"]);
+		checkIfNotUser(user, res);
 		const {
 			name,
 			email,
@@ -151,6 +160,76 @@ exports.getUser = async (req, res, next) => {
 					following,
 					bio,
 				},
+			},
+		});
+	} catch (err) {
+		next(err);
+	}
+};
+
+// handle forgot password
+exports.forgotPassword = async (req, res, next) => {
+	const { email } = req.body;
+	const errors = validationResult(req);
+	if (!errors.isEmpty()) {
+		return res.status(422).json({ errors: errors.array() });
+	}
+	try {
+		const user = await User.findOne({ email });
+		if (!user) {
+			return res.json({
+				data: {
+					msg: "Password reset token sent successfully to your email.",
+				},
+			});
+		}
+		const token = shortid.generate();
+		console.log(token);
+		user.resetToken = token;
+		user.resetTokenExpirationDate = Date.now() + 3600000;
+		await user.save();
+		sendResetEmail(user.email, token);
+		res.json({
+			data: {
+				msg: "Password reset token sent successfully to your email",
+			},
+		});
+	} catch (err) {
+		next(err);
+	}
+};
+
+// handle reset link
+exports.resetPassword = async (req, res, next) => {
+	const { password, token } = req.body;
+	const errors = validationResult(req);
+	if (!errors.isEmpty()) {
+		return res.status(422).json({ errors: errors.array() });
+	}
+	try {
+		// const token = req.params.token;
+		const user = await User.findOne(
+			{ resetTokenExpirationDate: { $gt: Date.now() } },
+			{ resetToken: token },
+		);
+		if (!user) {
+			return res.status(400).json({
+				errors: [
+					{
+						msg: "Invalid credentials provided",
+						status: "400",
+					},
+				],
+			});
+		}
+		const hashedPassword = await bcrypt.hash(password, 10);
+		user.password = hashedPassword;
+		user.resetToken = undefined;
+		user.resetTokenExpirationDate = undefined;
+		await user.save();
+		res.json({
+			data: {
+				msg: "Password updated successfully",
 			},
 		});
 	} catch (err) {

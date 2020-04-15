@@ -43,8 +43,8 @@ const UserSchema = new mongoose.Schema({
 			default: process.env.DEFAULT_COVER_ID,
 		},
 	},
-	// resetToken: String,
-	// resetTokenExpiration: String,
+	resetToken: String,
+	resetTokenExpirationDate: Date,
 	bio: {
 		about: {
 			type: String,

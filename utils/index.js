@@ -6,6 +6,8 @@ const objectIdError = require("./objectIdError");
 const checkIfAuthenticated = require("./checkIfAuthenticated");
 const checkIfBlocked = require("./checkIfBlocked");
 const reservedUsernames = require("./reservedUsernames");
+const welcomeEmail = require("./welcomeEmail");
+const sendResetEmail = require("./sendResetEmail");
 
 module.exports = {
 	applyRoutes,
@@ -15,5 +17,7 @@ module.exports = {
 	objectIdError,
 	checkIfAuthenticated,
 	checkIfBlocked,
-	reservedUsernames
+	reservedUsernames,
+	welcomeEmail,
+	sendResetEmail,
 };

@@ -280,7 +280,6 @@ exports.changeAvatar = async (req, res, next) => {
 	try {
 		const user = await User.findById(req.user.id);
 		checkIfNotUser(user, res);
-		console.log(req.file);
 		const url = req.file.url;
 		const id = req.file.public_id;
 		user.avatar.url = url;
@@ -349,6 +348,24 @@ exports.removeCoverImage = async (req, res, next) => {
 		res.json({
 			data: {
 				url,
+			},
+		});
+	} catch (err) {
+		next(err);
+	}
+};
+
+// delete account
+exports.deleteAccount = async (req, res, next) => {
+	try {
+		const user = await User.findById(req.user.id);
+		checkIfNotUser(user, res);
+		await user.remove();
+		await Post.deleteMany({ user: req.user.id });
+		await Comment.deleteMany({ user: req.user.id });
+		res.json({
+			data: {
+				msg: "Account successfully Deleted!",
 			},
 		});
 	} catch (err) {
