@@ -17,7 +17,8 @@ const {
 	changeCoverImage,
 	removeAvatar,
 	removeCoverImage,
-	deleteAccount
+	deleteAccount,
+	changePassword,
 } = require("../controllers/users");
 
 cloudinary.config({
@@ -127,6 +128,24 @@ router.put(
  * @api private
  */
 router.put("/profile-change/username", authenticator, changeUsername);
+
+/*
+ * @desc Change password of current user
+ * @method PUT
+ * @api private
+ */
+router.put(
+	"/profile-change/password",
+	[
+		check("oldPassword", "All fields are required").not().isEmpty(),
+		check(
+			"newPassword",
+			"Your password must be at least 8 characters"
+		).isLength({ min: 8 }),
+		authenticator,
+	],
+	changePassword
+);
 
 /*
  * @desc Change avatar of current user

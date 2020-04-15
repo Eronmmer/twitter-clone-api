@@ -1,3 +1,4 @@
+const bcrypt = require("bcryptjs");
 const User = require("../models/User");
 const Post = require("../models/Post");
 const Comment = require("../models/Comment");
@@ -366,6 +367,43 @@ exports.deleteAccount = async (req, res, next) => {
 		res.json({
 			data: {
 				msg: "Account successfully Deleted!",
+			},
+		});
+	} catch (err) {
+		next(err);
+	}
+};
+
+// Change password of logged in user
+exports.changePassword = async (req, res, next) => {
+	const { oldPassword, newPassword } = req.body;
+	const errors = validationResult(req);
+	if (!errors.isEmpty()) {
+		return res.status(422).json({ errors: errors.array() });
+	}
+	try {
+		const user = await User.findById(req.user.id);
+		console.log(req.user.id);
+		checkIfNotUser(user, res);
+
+		console.log(user);
+		const isMatch = await bcrypt.compare(oldPassword, user.password);
+		if (!isMatch) {
+			return res.status(400).json({
+				errors: [
+					{
+						msg: "The password you entered was incorrect",
+						status: "400",
+					},
+				],
+			});
+		}
+		const hashedPassword = await bcrypt.hash(newPassword, 10);
+		user.password = hashedPassword;
+		await user.save();
+		res.json({
+			data: {
+				msg: "Password updated successfully",
 			},
 		});
 	} catch (err) {
