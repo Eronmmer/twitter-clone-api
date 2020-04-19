@@ -38,10 +38,9 @@ npm start
 
 **test:**
 
-> coming soon ⚡
-<!-- ```bash
-npm run test
-``` -->
+```bash
+npm test
+```
 
 ## API Documentation
 
