@@ -6,6 +6,7 @@ const checkIfAuthenticated = require("./checkIfAuthenticated");
 const reservedUsernames = require("./reservedUsernames");
 const welcomeEmail = require("./welcomeEmail");
 const sendResetEmail = require("./sendResetEmail");
+const dropAllCollections = require("./dropAllCollections");
 
 module.exports = {
 	applyRoutes,
@@ -16,4 +17,5 @@ module.exports = {
 	reservedUsernames,
 	welcomeEmail,
 	sendResetEmail,
+	dropAllCollections
 };

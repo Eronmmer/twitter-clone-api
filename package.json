@@ -4,11 +4,18 @@
   "description": "It is what it is.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+		"test": "jest --forceExit --detectOpenHandles --maxWorkers=10",
+		"test:watch": "jest --watch",
     "dev": "nodemon index.js",
     "start": "node index.js",
     "lint": "eslint .",
     "lint:fix": "eslint --fix --ext .js,.ts, ."
+  },
+  "jest": {
+		"testEnvironment": "node",
+		"coveragePathIgnorePatterns": [
+			"/node_modules/"
+		]
   },
   "repository": {
     "type": "git",
@@ -48,7 +55,9 @@
   "devDependencies": {
     "eslint": "^6.8.0",
     "eslint-plugin-import": "^2.20.2",
+    "jest": "^25.3.0",
     "nodemon": "^2.0.2",
-    "prettier": "^2.0.4"
+    "prettier": "^2.0.4",
+    "supertest": "^4.0.2"
   }
 }
